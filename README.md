@@ -59,4 +59,4 @@ import ncell from 'ncell';
 console.log(await ncell.balance());
 ```
 
-See the [SDK guide](https://rohityadav-sas.github.io/ncell-app/#sdk) for login, methods, events and custom storage.
+Read the [docs](https://rohityadav-sas.github.io/ncell-app/#sdk) for login, methods, events and custom storage.
