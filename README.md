@@ -60,17 +60,3 @@ console.log(await ncell.balance());
 ```
 
 See the [SDK guide](https://rohityadav-sas.github.io/ncell-app/#sdk) for login, methods, events and custom storage.
-
-## Documentation
-
-- [CLI guide](https://rohityadav-sas.github.io/ncell-app/#login)
-- [Games and rewards](https://rohityadav-sas.github.io/ncell-app/#games)
-- [Command scripts](https://rohityadav-sas.github.io/ncell-app/#scripts)
-- [SDK guide](https://rohityadav-sas.github.io/ncell-app/#sdk)
-- [Command reference](https://rohityadav-sas.github.io/ncell-app/#commands)
-- [Response codes](https://rohityadav-sas.github.io/ncell-app/#response-codes)
-- [Development and tests](https://rohityadav-sas.github.io/ncell-app/#development)
-
-## License
-
-MIT. See [LICENSE](https://github.com/rohityadav-sas/ncell-app/blob/main/LICENSE).
