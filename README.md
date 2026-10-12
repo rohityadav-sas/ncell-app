@@ -61,18 +61,6 @@ console.log(await ncell.balance());
 
 See the [SDK guide](https://rohityadav-sas.github.io/ncell-app/#sdk) for login, methods, events and custom storage.
 
-The CLI uses your OS credential store. Linux needs an unlocked Secret Service keyring. Credentials remain separate from the Rust CLI. See [installation requirements](https://rohityadav-sas.github.io/ncell-app/#installation-requirements).
-
-**From source**
-
-```sh
-git clone https://github.com/rohityadav-sas/ncell-app.git
-cd ncell-app
-npm ci
-npm run build
-node dist/cli/main.js --help
-```
-
 ## Documentation
 
 - [CLI guide](https://rohityadav-sas.github.io/ncell-app/#login)
