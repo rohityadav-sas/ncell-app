@@ -1,0 +1,1674 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ncell documentation</title>
+
+    <meta
+      name="description"
+      content="Ncell CLI and TypeScript SDK: installation, accounts, plans, SMS, games, scripts and API reference."
+    />
+
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+
+    <meta name="theme-color" content="#100e15" media="(prefers-color-scheme: dark)" />
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+    <script>
+      (function () {
+        var theme;
+
+        try {
+          theme = localStorage.getItem('ncell-package-docs-theme');
+        } catch (e) {}
+
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
+
+    <noscript>
+      <style>
+        .search-btn,
+        .menu-btn,
+        .theme-btn,
+        .copy-btn {
+          display: none !important;
+        }
+
+        @media (max-width: 900px) {
+          #sidebar {
+            display: block;
+
+            position: static;
+
+            width: auto;
+
+            max-width: none;
+
+            border: 0;
+
+            box-shadow: none;
+          }
+
+          main {
+            padding-top: 16px;
+          }
+        }
+      </style>
+    </noscript>
+
+    <link rel="stylesheet" href="style.css" />
+
+    <link href="https://rohityadav-sas.github.io/ncell-app/" rel="canonical" />
+  </head>
+
+  <body>
+    <!-- Icons: Lucide (ISC license) and GitHub mark from Octicons (MIT license), inlined as an SVG sprite. -->
+
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
+      <symbol id="i-search" viewBox="0 0 24 24">
+        <path d="m21 21-4.34-4.34" />
+
+        <circle cx="11" cy="11" r="8" />
+      </symbol>
+
+      <symbol id="i-menu" viewBox="0 0 24 24">
+        <path d="M4 5h16" />
+
+        <path d="M4 12h16" />
+
+        <path d="M4 19h16" />
+      </symbol>
+
+      <symbol id="i-sun" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="4" />
+
+        <path d="M12 2v2" />
+
+        <path d="M12 20v2" />
+
+        <path d="m4.93 4.93 1.41 1.41" />
+
+        <path d="m17.66 17.66 1.41 1.41" />
+
+        <path d="M2 12h2" />
+
+        <path d="M20 12h2" />
+
+        <path d="m6.34 17.66-1.41 1.41" />
+
+        <path d="m19.07 4.93-1.41 1.41" />
+      </symbol>
+
+      <symbol id="i-moon" viewBox="0 0 24 24">
+        <path
+          d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"
+        />
+      </symbol>
+
+      <symbol id="i-copy" viewBox="0 0 24 24">
+        <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+
+        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+      </symbol>
+
+      <symbol id="i-check" viewBox="0 0 24 24">
+        <path d="M20 6 9 17l-5-5" />
+      </symbol>
+
+      <symbol id="i-terminal" viewBox="0 0 24 24">
+        <path d="M12 19h8" />
+
+        <path d="m4 17 6-6-6-6" />
+      </symbol>
+
+      <symbol id="i-info" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" />
+
+        <path d="M12 16v-4" />
+
+        <path d="M12 8h.01" />
+      </symbol>
+
+      <symbol id="i-triangle-alert" viewBox="0 0 24 24">
+        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+
+        <path d="M12 9v4" />
+
+        <path d="M12 17h.01" />
+      </symbol>
+
+      <symbol id="i-arrow-right" viewBox="0 0 24 24">
+        <path d="M5 12h14" />
+
+        <path d="m12 5 7 7-7 7" />
+      </symbol>
+
+      <symbol id="i-arrow-up" viewBox="0 0 24 24">
+        <path d="m5 12 7-7 7 7" />
+
+        <path d="M12 19V5" />
+      </symbol>
+
+      <symbol id="i-arrow-down" viewBox="0 0 24 24">
+        <path d="M12 5v14" />
+
+        <path d="m19 12-7 7-7-7" />
+      </symbol>
+
+      <symbol id="i-corner-down-left" viewBox="0 0 24 24">
+        <path d="M20 4v7a4 4 0 0 1-4 4H4" />
+
+        <path d="m9 10-5 5 5 5" />
+      </symbol>
+
+      <symbol id="i-hash" viewBox="0 0 24 24">
+        <line x1="4" x2="20" y1="9" y2="9" />
+
+        <line x1="4" x2="20" y1="15" y2="15" />
+
+        <line x1="10" x2="8" y1="3" y2="21" />
+
+        <line x1="16" x2="14" y1="3" y2="21" />
+      </symbol>
+
+      <symbol id="i-file-text" viewBox="0 0 24 24">
+        <path
+          d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"
+        />
+
+        <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+
+        <path d="M10 9H8" />
+
+        <path d="M16 13H8" />
+
+        <path d="M16 17H8" />
+      </symbol>
+
+      <symbol id="i-book-open" viewBox="0 0 24 24">
+        <path d="M12 5v16" />
+
+        <path
+          d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"
+        />
+      </symbol>
+
+      <symbol id="i-download" viewBox="0 0 24 24">
+        <path d="M12 15V3" />
+
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+
+        <path d="m7 10 5 5 5-5" />
+      </symbol>
+
+      <symbol id="i-log-in" viewBox="0 0 24 24">
+        <path d="m10 17 5-5-5-5" />
+
+        <path d="M15 12H3" />
+
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+      </symbol>
+
+      <symbol id="i-wallet" viewBox="0 0 24 24">
+        <path
+          d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"
+        />
+
+        <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
+      </symbol>
+
+      <symbol id="i-tag" viewBox="0 0 24 24">
+        <path
+          d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"
+        />
+
+        <circle cx="7.5" cy="7.5" r=".5" fill="currentColor" />
+      </symbol>
+
+      <symbol id="i-list-filter" viewBox="0 0 24 24">
+        <path d="M2 5h20" />
+
+        <path d="M6 12h12" />
+
+        <path d="M9 19h6" />
+      </symbol>
+
+      <symbol id="i-credit-card" viewBox="0 0 24 24">
+        <rect width="20" height="14" x="2" y="5" rx="2" />
+
+        <line x1="2" x2="22" y1="10" y2="10" />
+
+        <path d="M6 14h2" />
+      </symbol>
+
+      <symbol id="i-message-square" viewBox="0 0 24 24">
+        <path
+          d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"
+        />
+      </symbol>
+
+      <symbol id="i-braces" viewBox="0 0 24 24">
+        <path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1" />
+
+        <path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1" />
+      </symbol>
+
+      <symbol id="i-refresh-cw" viewBox="0 0 24 24">
+        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+
+        <path d="M21 3v5h-5" />
+
+        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+
+        <path d="M8 16H3v5" />
+      </symbol>
+
+      <symbol id="i-upload" viewBox="0 0 24 24">
+        <path d="M12 3v12" />
+
+        <path d="m17 8-5-5-5 5" />
+
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      </symbol>
+
+      <symbol id="i-wrench" viewBox="0 0 24 24">
+        <path
+          d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"
+        />
+      </symbol>
+
+      <symbol id="i-globe" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" />
+
+        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+
+        <path d="M2 12h20" />
+      </symbol>
+
+      <symbol id="i-code-xml" viewBox="0 0 24 24">
+        <path d="m18 16 4-4-4-4" />
+
+        <path d="m6 8-4 4 4 4" />
+
+        <path d="m14.5 4-5 16" />
+      </symbol>
+
+      <symbol id="i-shield-check" viewBox="0 0 24 24">
+        <path
+          d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+        />
+
+        <path d="m9 12 2 2 4-4" />
+      </symbol>
+
+      <symbol id="i-smartphone" viewBox="0 0 24 24">
+        <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+
+        <path d="M12 18h.01" />
+      </symbol>
+
+      <symbol id="i-table-2" viewBox="0 0 24 24">
+        <path d="M3 9h18" />
+
+        <path d="M9 3v18" />
+
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+      </symbol>
+
+      <symbol id="i-github" viewBox="0 0 16 16">
+        <path
+          d="M6.766 11.328c-2.063-.25-3.516-1.734-3.516-3.656 0-.781.281-1.625.75-2.188-.203-.515-.172-1.609.063-2.062.625-.078 1.468.25 1.968.703.594-.187 1.219-.281 1.985-.281.765 0 1.39.094 1.953.265.484-.437 1.344-.765 1.969-.687.218.422.25 1.515.046 2.047.5.593.766 1.39.766 2.203 0 1.922-1.453 3.375-3.547 3.64.531.344.89 1.094.89 1.954v1.625c0 .468.391.734.86.547C13.781 14.359 16 11.53 16 8.03 16 3.61 12.406 0 7.984 0 3.563 0 0 3.61 0 8.031a7.88 7.88 0 0 0 5.172 7.422c.422.156.828-.125.828-.547v-1.25c-.219.094-.5.156-.75.156-1.031 0-1.64-.562-2.078-1.609-.172-.422-.36-.672-.719-.719-.187-.015-.25-.093-.25-.187 0-.188.313-.328.625-.328.453 0 .844.281 1.25.86.313.452.64.655 1.031.655s.641-.14 1-.5c.266-.265.47-.5.657-.656"
+        />
+      </symbol>
+    </svg>
+
+    <a class="skip" href="#content">Skip to content</a>
+
+    <header class="header">
+      <div class="header-inner">
+        <button
+          id="menu-btn"
+          class="icon-btn menu-btn"
+          type="button"
+          aria-label="Toggle navigation"
+          aria-expanded="false"
+          aria-controls="sidebar"
+        >
+          <svg class="ico" aria-hidden="true">
+            <use href="#i-menu" />
+          </svg>
+        </button>
+
+        <a class="brand" href="#overview">
+          <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true">
+            <rect width="64" height="64" rx="16" fill="#702da0" />
+
+            <path
+              d="m17 20 13 12-13 12m23 0h10"
+              fill="none"
+              stroke="#fff"
+              stroke-width="5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+
+          <span>ncell</span>
+        </a>
+
+        <span class="version">v0.1.0</span>
+
+        <div class="header-center">
+          <button
+            id="search-btn"
+            class="search-btn"
+            type="button"
+            aria-label="Search documentation"
+            aria-keyshortcuts="/"
+          >
+            <svg class="ico" aria-hidden="true">
+              <use href="#i-search" />
+            </svg>
+
+            <span class="search-text">Search documentation</span>
+
+            <kbd>/</kbd>
+          </button>
+        </div>
+
+        <div class="header-actions">
+          <a
+            class="icon-btn"
+            href="https://github.com/rohityadav-sas/ncell-app"
+            aria-label="ncell on GitHub"
+            ><svg class="ico ico-fill" aria-hidden="true">
+              <use href="#i-github" /></svg
+          ></a>
+
+          <button id="theme-btn" class="icon-btn theme-btn" type="button" aria-label="Switch theme">
+            <svg class="ico icon-moon" aria-hidden="true">
+              <use href="#i-moon" /></svg
+            ><svg class="ico icon-sun" aria-hidden="true">
+              <use href="#i-sun" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div id="scrim" class="scrim" hidden></div>
+
+    <aside id="sidebar">
+      <nav aria-label="Documentation">
+        <p class="nav-title">Getting started</p>
+        <a href="#overview"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-book-open" /></svg
+          ><span>Overview</span></a
+        >
+        <a href="#installation"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-download" /></svg
+          ><span>Installation</span></a
+        >
+        <p class="nav-title">Accounts</p>
+        <a href="#login"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-log-in" /></svg
+          ><span>Login and OTP</span></a
+        >
+        <a href="#login-accounts"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-log-in" /></svg
+          ><span>Multiple accounts</span></a
+        >
+        <a href="#login-session"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-log-in" /></svg
+          ><span>Session status and logout</span></a
+        >
+        <a href="#sessions"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-refresh-cw" /></svg
+          ><span>Token refresh</span></a
+        >
+        <a href="#balance"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-wallet" /></svg
+          ><span>Balance and profile</span></a
+        >
+        <p class="nav-title">Plans</p>
+        <a href="#plans"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-tag" /></svg
+          ><span>Browse plans and categories</span></a
+        >
+        <a href="#searching"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-list-filter" /></svg
+          ><span>Search and sorting</span></a
+        >
+        <a href="#subscribe"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-credit-card" /></svg
+          ><span>Subscribe to a plan</span></a
+        >
+        <p class="nav-title">SMS</p>
+        <a href="#sms"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-message-square" /></svg
+          ><span>Send free SMS</span></a
+        >
+        <p class="nav-title">Games</p>
+        <a href="#games"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-terminal" /></svg
+          ><span>Overview</span></a
+        >
+        <a href="#games-check-in"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-terminal" /></svg
+          ><span>Daily check-in</span></a
+        >
+        <a href="#games-status"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-list-filter" /></svg
+          ><span>Task status</span></a
+        >
+        <a href="#games-claim-task"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-credit-card" /></svg
+          ><span>Claim task rewards</span></a
+        >
+        <a href="#games-math"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-terminal" /></svg
+          ><span>Math</span></a
+        >
+        <a href="#games-scratch"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-credit-card" /></svg
+          ><span>Scratch card</span></a
+        >
+        <a href="#games-spin"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-refresh-cw" /></svg
+          ><span>Spinner</span></a
+        >
+        <a href="#games-ranks"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-list-filter" /></svg
+          ><span>Rankings</span></a
+        >
+        <a href="#games-repeat"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-refresh-cw" /></svg
+          ><span>Multiple games and delay</span></a
+        >
+        <p class="nav-title">Automation</p>
+        <a href="#scripts"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-terminal" /></svg
+          ><span>Scripts</span></a
+        >
+        <p class="nav-title">Package</p>
+        <a href="#sdk"
+          ><svg class="ico" aria-hidden="true"><use href="#i-braces" /></svg
+          ><span>Use as a package</span></a
+        ><a href="#sdk-methods"
+          ><svg class="ico" aria-hidden="true"><use href="#i-braces" /></svg><span>Methods</span></a
+        ><a href="#sdk-stores"
+          ><svg class="ico" aria-hidden="true"><use href="#i-braces" /></svg
+          ><span>Session stores</span></a
+        ><a href="#sdk-cli"
+          ><svg class="ico" aria-hidden="true"><use href="#i-braces" /></svg
+          ><span>Embed the CLI</span></a
+        >
+        <p class="nav-title">Reference</p>
+        <a href="#commands"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-terminal" /></svg
+          ><span>Command reference</span></a
+        >
+        <a href="#response-codes"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-info" /></svg
+          ><span>Response codes</span></a
+        ><a href="#output"
+          ><svg class="ico" aria-hidden="true"><use href="#i-file-text" /></svg
+          ><span>Output and errors</span></a
+        ><a href="#development"
+          ><svg class="ico" aria-hidden="true"><use href="#i-terminal" /></svg
+          ><span>Development and tests</span></a
+        >
+      </nav>
+    </aside>
+
+    <main>
+      <article id="content">
+        <figure id="overview" class="doc-banner">
+          <picture>
+            <source media="(max-width: 540px)" srcset="./assets/banner-mobile.svg" />
+
+            <img
+              src="./assets/banner.svg"
+              width="1200"
+              height="360"
+              alt="ncell — Your Ncell account, in your terminal and your code. TypeScript CLI and SDK for Ncell Nepal."
+            />
+          </picture>
+        </figure>
+
+        <div class="actions">
+          <a class="btn btn-primary" href="#installation"
+            ><span>Get started</span
+            ><svg class="ico" aria-hidden="true">
+              <use href="#i-arrow-right" /></svg
+          ></a>
+
+          <a class="btn btn-secondary download-btn" href="https://www.npmjs.com/package/ncell"
+            ><svg class="ico" aria-hidden="true">
+              <use href="#i-download" /></svg
+            ><span>View on npm</span></a
+          >
+        </div>
+
+        <nav class="cards" aria-label="Popular topics">
+          <a class="card" href="#installation"
+            ><span class="icon-tile"
+              ><svg class="ico" aria-hidden="true">
+                <use href="#i-download" /></svg></span
+            ><span
+              ><span class="card-title">Installation</span
+              ><span class="card-text">Install the CLI or package with npm.</span></span
+            ></a
+          >
+
+          <a class="card" href="#login"
+            ><span class="icon-tile"
+              ><svg class="ico" aria-hidden="true">
+                <use href="#i-log-in" /></svg></span
+            ><span
+              ><span class="card-title">Authentication</span
+              ><span class="card-text">Sign in with an SMS OTP.</span></span
+            ></a
+          >
+
+          <a class="card" href="#plans"
+            ><span class="icon-tile"
+              ><svg class="ico" aria-hidden="true">
+                <use href="#i-tag" /></svg></span
+            ><span
+              ><span class="card-title">Plans and categories</span
+              ><span class="card-text">Browse categories and find the right pack.</span></span
+            ></a
+          >
+
+          <a class="card" href="#sdk"
+            ><span class="icon-tile"
+              ><svg class="ico" aria-hidden="true">
+                <use href="#i-credit-card" /></svg></span
+            ><span
+              ><span class="card-title">TypeScript SDK</span
+              ><span class="card-text">Use Ncell from your own Node.js application.</span></span
+            ></a
+          >
+
+          <a class="card" href="#sms"
+            ><span class="icon-tile"
+              ><svg class="ico" aria-hidden="true">
+                <use href="#i-message-square" /></svg></span
+            ><span
+              ><span class="card-title">Send Free SMS</span
+              ><span class="card-text">Send a message using your free SMS allowance.</span></span
+            ></a
+          >
+
+          <a class="card" href="#commands"
+            ><span class="icon-tile"
+              ><svg class="ico" aria-hidden="true">
+                <use href="#i-terminal" /></svg></span
+            ><span
+              ><span class="card-title">Command reference</span
+              ><span class="card-text">Every command and option at a glance.</span></span
+            ></a
+          >
+        </nav>
+
+        <h2 id="installation">Installation</h2>
+        <p>Requires Node.js 22.12 or newer. Works on Windows, macOS and Linux.</p>
+        <h3 id="installation-cli">Install the CLI</h3>
+        <p>Install the command globally.</p>
+        <pre data-lang="Shell"><code>npm install -g ncell</code></pre>
+        <p>Show the available commands.</p>
+        <pre data-lang="Shell"><code>ncell --help</code></pre>
+        <h3 id="installation-npx">Run without installing globally</h3>
+        <pre data-lang="Shell"><code>npx ncell --help</code></pre>
+        <p>
+          The Rust CLI also uses the command <code>ncell</code>. Use <code>npx ncell</code> to
+          select the npm package explicitly when both are installed.
+        </p>
+        <h3 id="installation-package">Install the package</h3>
+        <p>Use the same implementation from a Node.js project.</p>
+        <pre data-lang="Shell"><code>npm install ncell</code></pre>
+        <p>See <a href="#sdk">Use as a package</a> for TypeScript and JavaScript examples.</p>
+        <h3 id="installation-requirements">Credential storage</h3>
+        <p>
+          The CLI uses your native OS credential store. On Linux, unlock a Secret Service provider
+          such as GNOME Keyring or KWallet with Secret Service enabled. A desktop session normally
+          provides its D-Bus connection.
+        </p>
+        <p>
+          For a headless Node.js application, provide an
+          <a href="#sdk-stores">in-memory or custom session store</a>. This package currently
+          targets Node.js.
+        </p>
+        <h3 id="installation-source">From source</h3>
+        <pre data-lang="Shell"><code>git clone https://github.com/rohityadav-sas/ncell-app.git
+cd ncell-app
+npm ci
+npm run build</code></pre>
+        <p>Run the built CLI directly.</p>
+        <pre data-lang="Shell"><code>node dist/cli/main.js --help</code></pre>
+        <p>
+          To link this source checkout to the <code>ncell</code> command, run <code>npm link</code>.
+          Linking can replace an existing command with the same name.
+        </p>
+        <h2 id="login">Authentication</h2>
+
+        <p>Sign in with an OTP. The code is visible as you type:</p>
+
+        <pre data-lang="Shell"><code>ncell login 98XXXXXXXX</code></pre>
+
+        <h3 id="login-verify">Resume instead of resending OTP again</h3>
+
+        <pre data-lang="Shell"><code>ncell login 98XXXXXXXX --verify</code></pre>
+
+        <p>
+          Use this after an interruption or mistyped OTP. It resumes the pending login for that
+          number without generating another OTP.
+        </p>
+
+        <h3 id="login-accounts">Multiple accounts</h3>
+        <p>
+          <a href="#login">Log in</a> to save an account and switch to it. Use the commands below to
+          manage saved accounts.
+        </p>
+        <h4>Add an account</h4>
+        <p>Save another account without changing the active account.</p>
+        <pre data-lang="Shell"><code>ncell account add 98XXXXXXXX</code></pre>
+
+        <h4>List accounts</h4>
+        <p>Show all saved accounts and which one is active.</p>
+        <pre data-lang="Shell"><code>ncell account list</code></pre>
+
+        <h4>Switch accounts</h4>
+        <p>Switch to a saved account without requesting another OTP.</p>
+        <pre data-lang="Shell"><code>ncell account switch 98XXXXXXXX</code></pre>
+
+        <h4>Remove an account</h4>
+        <p>
+          Remove the specified saved account. If it is active, another saved account becomes active
+          when available.
+        </p>
+        <pre data-lang="Shell"><code>ncell account remove 98XXXXXXXX</code></pre>
+
+        <h3 id="login-session">Inspect or remove the saved session</h3>
+        <h4>Session status</h4>
+        <p>
+          Show the active account, login time and saved token expiry. This reads the saved session
+          without checking token acceptance with Ncell.
+        </p>
+        <pre data-lang="Shell"><code>ncell status</code></pre>
+        <p>
+          Dates use Nepal time and a 12-hour clock. This command reads saved metadata; it does not
+          make a server request.
+        </p>
+
+        <h4>Log out</h4>
+        <p>Remove only the active account. Another saved account becomes active if available.</p>
+        <pre data-lang="Shell"><code>ncell logout</code></pre>
+
+        <h2 id="sessions">Sessions and token refresh</h2>
+        <p>
+          Tokens and device identity are stored in your OS's native credential store. Accounts stay
+          separate from the Rust CLI.
+        </p>
+        <p>
+          The credential service keeps its original name, <code>ncell-app</code>, so existing npm
+          logins survive the package rename. Each account has its own secure entry. The CLI never
+          stores tokens in scripts or plain-text configuration files.
+        </p>
+        <h3 id="sessions-auto">Automatic refresh</h3>
+        <p>
+          The CLI refreshes tokens when Ncell reports an expired access token. A rejected refresh
+          token requires a new login. Other failures do not trigger reward-request retries.
+        </p>
+        <h3 id="sessions-manual">Manual refresh</h3>
+        <pre data-lang="Shell"><code>ncell refresh</code></pre>
+        <h2 id="balance">Balance and profile</h2>
+        <h3>Check your balance</h3>
+        <p>Show your current balance, data, voice and SMS allowances.</p>
+        <pre data-lang="Shell"><code>ncell balance</code></pre>
+
+        <h3>View your profile</h3>
+        <p>Show the account number, name, SIM type, status, plan and payment mode.</p>
+        <pre data-lang="Shell"><code>ncell profile</code></pre>
+
+        <h2 id="plans">Plans and categories</h2>
+
+        <h3>Browse plans</h3>
+        <p>List plans in the default category <code>66</code>.</p>
+        <pre data-lang="Shell"><code>ncell plans</code></pre>
+
+        <h3>List categories</h3>
+        <p>Find the available category IDs.</p>
+        <pre data-lang="Shell"><code>ncell plans categories</code></pre>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Category</th>
+
+                <th>Type</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td>50</td>
+
+                <td>SMS</td>
+              </tr>
+
+              <tr>
+                <td>61</td>
+
+                <td>Voice</td>
+              </tr>
+
+              <tr>
+                <td>66</td>
+
+                <td>Data &amp; Voice (default)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>View a specific category</h3>
+        <p>
+          List plans in category <code>61 (Voice)</code>. Use the category ID from the category list
+          from <code>ncell plans categories</code>.
+        </p>
+        <pre data-lang="Shell"><code>ncell plans --category 61</code></pre>
+
+        <h2 id="searching">Search and sorting</h2>
+        <h3>Search within a category</h3>
+        <p>Search for SMS plans in category 50.</p>
+        <pre data-lang="Shell"><code>ncell plans search "SMS" --category 50</code></pre>
+
+        <h3>Search and sort by price</h3>
+        <p>Find matching plans, ordered by price from low to high.</p>
+        <pre data-lang="Shell"><code>ncell plans search "Super" --sort price</code></pre>
+
+        <h3>Search and sort by validity</h3>
+        <p>Find matching plans, ordered by longest validity first, then lowest price.</p>
+        <pre
+          data-lang="Shell"
+        ><code>ncell plans search "Combo" --sort validity:desc,price:asc</code></pre>
+
+        <h3 id="searching-sort">Sort by more than one field</h3>
+
+        <h4>Combine sort fields</h4>
+        <p>
+          Separate ordered sort fields with commas. This searches SMS plans and sorts by validity
+          descending, then price ascending.
+        </p>
+        <pre
+          data-lang="Shell"
+        ><code>ncell plans search "SMS" --category 50 --sort validity:desc,price:asc</code></pre>
+
+        <h4>Use the default direction</h4>
+        <p>Omit directions to sort both fields in ascending order.</p>
+        <pre data-lang="Shell"><code>ncell plans --sort validity,price</code></pre>
+
+        <p>
+          Supported fields are <code>price</code> and
+
+          <code>validity</code>. Directions are <code>asc</code> and
+
+          <code>desc</code>; default is <code>asc</code>.
+        </p>
+
+        <h2 id="subscribe">Subscribe to a plan</h2>
+        <h3>Find a plan</h3>
+        <p>List plans in the category and note the plan ID you want.</p>
+        <pre data-lang="Shell"><code>ncell plans --category 50</code></pre>
+
+        <h3>Subscribe</h3>
+        <p>Use the plan ID and its category. Paid packs charge your Ncell account.</p>
+        <pre data-lang="Shell"><code>ncell plans subscribe 984 --category 50</code></pre>
+
+        <p>
+          The plan ID is a required positional argument. Use a category ID from the category list;
+          <code>--category</code> defaults to 66.
+        </p>
+
+        <h2 id="sms">Send Free SMS</h2>
+
+        <pre data-lang="Shell"><code>ncell sms send-free 98XXXXXXXX "Hello"</code></pre>
+
+        <h2 id="games">Game rewards</h2>
+
+        <p>Check in daily, claim task rewards, view your rankings, or play games.</p>
+
+        <h3 id="games-check-in">Daily check-in</h3>
+        <p>
+          Claims today's check-in reward and displays your streak, weekly points and token balance.
+        </p>
+        <p>Already checked in today is a successful result.</p>
+        <pre data-lang="Shell"><code>ncell game check-in</code></pre>
+
+        <h3 id="games-status">Task status</h3>
+        <p>Lists task IDs, progress, rewards and status.</p>
+        <pre data-lang="Shell"><code>ncell game status</code></pre>
+
+        <h3 id="games-claim-task">Claim task rewards</h3>
+        <p>Use task IDs from <code>ncell game status</code>.</p>
+        <p>
+          Claims run one at a time and each result appears immediately. Already claimed tasks
+          succeed. <code>all</code> claims completed, unclaimed tasks in server order and succeeds
+          when none are available.
+        </p>
+        <pre data-lang="Shell"><code>ncell game claim-task 1,2,3</code></pre>
+
+        <p>Claim every completed task.</p>
+        <pre data-lang="Shell"><code>ncell game claim-task all</code></pre>
+
+        <h3 id="games-math">Math</h3>
+        <p>
+          Math solves supported arithmetic, averages and percentages automatically. Unsupported
+          questions ask for an answer in the terminal. A lost game stops the run. The bg_reward
+          field is available only through JSON and is not a token refund.
+        </p>
+        <pre data-lang="Shell"><code>ncell game math</code></pre>
+
+        <pre data-lang="Output"><code>Level  Question                      Answer  Result   Score
+-----------------------------------------------------------
+    1  9 + 4                             13  correct      5
+    2  8 + 2                             10  correct     10
+  ...
+   20  avg(17, 11, 23)                   17  win        165
+Math win | Score 165</code></pre>
+
+        <h3 id="games-scratch">Scratch card</h3>
+        <p>Play a scratch card using your game tokens.</p>
+        <pre data-lang="Shell"><code>ncell game scratch</code></pre>
+
+        <pre data-lang="Output"><code>Game          Reward                  Tokens        Points
+----------------------------------------------------------
+
+Scratch 1     50 Points                  160         6,695</code></pre>
+
+        <h3 id="games-spin">Spinner</h3>
+        <p>Spin using your game tokens.</p>
+
+        <pre data-lang="Shell"><code>ncell game spin</code></pre>
+
+        <pre data-lang="Output"><code>Game          Reward                  Tokens        Points
+----------------------------------------------------------
+
+Spin 1        50 Points                  160         6,695</code></pre>
+
+        <h3 id="games-ranks">Rankings</h3>
+        <p>Shows your weekly performance, last week's result, prizes and leaderboard.</p>
+
+        <pre data-lang="Shell"><code>ncell game ranks</code></pre>
+
+        <h3 id="games-repeat">Play multiple games</h3>
+
+        <h4>Multiple spins</h4>
+        <p>Play three spins with a 1.5-second delay between games.</p>
+        <pre data-lang="Shell"><code>ncell game spin --count 3 --delay 1.5s</code></pre>
+
+        <h4>Multiple scratch cards</h4>
+        <p>Play three scratch cards with a one-minute delay between games.</p>
+        <pre data-lang="Shell"><code>ncell game scratch --count 3 --delay 1m</code></pre>
+
+        <h4>Multiple math games</h4>
+        <p>Play two math games with a 1.5-hour delay between games.</p>
+        <pre data-lang="Shell"><code>ncell game math --count 2 --delay 1.5h</code></pre>
+
+        <ul>
+          <li><code>--count</code> is number of games (default 1).</li>
+
+          <li>
+            <code>--delay</code> is the amount of waiting time between each game (defaults is 0)
+          </li>
+        </ul>
+
+        <h4 id="scripts-games">Use remaining tokens</h4>
+        <p>
+          Use <code>--count all</code> with spin, scratch or math to keep playing while the
+          available balance can pay the 25-token entry fee. A smaller remainder is preserved.
+          Insufficient tokens stop an all-token run successfully; numeric counts fail when a
+          requested game cannot be played. Progress totals adapt to returned balances. There is no
+          maximum-game option.
+        </p>
+        <pre data-lang="Shell"><code>ncell game spin --count all --delay 1.5s</code></pre>
+
+        <h2 id="scripts">Scripts</h2>
+        <p>Create an editable command file and run its commands one at a time.</p>
+        <h3 id="scripts-create">Create a script</h3>
+        <p>
+          Use a name ending in .ncell. The CLI saves the example in its script library and opens
+          Notepad on Windows or the default text editor on macOS/Linux. Existing files are never
+          overwritten.
+        </p>
+        <pre data-lang="Shell"><code>ncell script create daily.ncell</code></pre>
+        <h3 id="scripts-list">List scripts</h3>
+        <p>List scripts saved in the CLI, sorted by name.</p>
+        <pre data-lang="Shell"><code>ncell script list</code></pre>
+        <h3 id="scripts-edit">Edit a script</h3>
+        <p>Opens a saved script in your default text editor.</p>
+        <pre data-lang="Shell"><code>ncell script edit daily.ncell</code></pre>
+        <h3 id="scripts-delete">Delete a script</h3>
+        <p>Delete a script using its name. This does not affect files in the current folder.</p>
+        <pre data-lang="Shell"><code>ncell script delete daily.ncell</code></pre>
+        <h3 id="scripts-run">Run a script</h3>
+        <p>
+          Edit and save the file, then run it by name. The CLI checks saved scripts first, then the
+          current folder. File paths are also supported.
+        </p>
+        <pre data-lang="Shell"><code>ncell script run daily.ncell</code></pre>
+        <h3 id="scripts-format">File format</h3>
+        <p>
+          Write command per line. The <code>ncell</code> prefix is optional. Blank lines and lines
+          starting with <code>#</code> are ignored. Use single or double quotes around arguments
+          containing spaces.
+        </p>
+        <pre data-lang="Text"><code>sms send-free 98XXXXXXXX "Hello from my script"</code></pre>
+        <h3 id="scripts-storage">Saved scripts</h3>
+        <p>The script library is shared with the Rust CLI; account credentials are separate.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>OS</th>
+                <th>Location</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Windows</td>
+                <td><code>%APPDATA%/ncell-cli/scripts</code></td>
+              </tr>
+              <tr>
+                <td>macOS</td>
+                <td><code>~/Library/Application Support/ncell-cli/scripts</code></td>
+              </tr>
+              <tr>
+                <td>Linux</td>
+                <td>
+                  <code>$XDG_DATA_HOME/ncell-cli/scripts</code>, or
+                  <code>~/.local/share/ncell-cli/scripts</code>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 id="scripts-errors">Validation and errors</h3>
+        <p>
+          The entire file is validated before requests begin. Shell commands, pipes, redirects,
+          substitutions and nested script commands are rejected. Account changes affect later
+          commands. OTP and unsupported-math prompts still work.
+        </p>
+        <p>
+          Results appear immediately, with a colored step heading and a blank line before the
+          command output. Any failure stops later commands and returns a nonzero exit code. Errors
+          show the executed step and physical source line.
+        </p>
+        <pre
+          data-lang="Output"
+        ><code>Step 3 of 14 (line 6): Not enough points (HTTP 200)</code></pre>
+        <h3 id="scripts-example">Script example</h3>
+        <pre data-lang="Text"><code># Daily rewards
+ncell game check-in
+ncell game claim-task 1,2,3,4,5,6,7,8
+
+# Spinner reward
+ncell game spin --count 5
+ncell game claim-task 22
+
+# Scratch card reward
+ncell game scratch --count 4
+ncell game claim-task 23
+
+# Math reward
+ncell game math --count 1
+ncell game claim-task 26
+
+# Game Warrior reward
+ncell game claim-task 18
+
+# Math Genius reward
+ncell game math --count 4
+ncell game claim-task 24
+
+# Spend remaining tokens
+ncell game spin --count all
+
+# Final checks
+ncell game status
+ncell game ranks
+</code></pre>
+
+        <h2 id="sdk">Use as a package</h2>
+        <p>
+          The default export is a ready-to-use <code>NcellApp</code> instance. Importing it does not
+          send requests or log in:
+        </p>
+        <pre data-lang="TypeScript"><code>import ncell from 'ncell';
+
+// Request an OTP, then enter the code sent to your phone.
+await ncell.requestOtp('98XXXXXXXX');
+await ncell.verifyOtp('98XXXXXXXX', '123456');
+
+console.log(await ncell.balance());
+console.log(await ncell.checkIn());
+</code></pre>
+        <p>Use a named factory when you need separate instances or options:</p>
+        <pre data-lang="TypeScript"><code>import { createNcellApp, NcellError } from 'ncell';
+
+const app = createNcellApp({ timeoutMs: 90_000 });
+
+try {
+  const result = await app.spin({
+    count: 3,
+    delay: '1.5s',
+    onEvent: (event) =&gt; console.log(event),
+  });
+  console.log(result.games, result.stop);
+} catch (error) {
+  if (error instanceof NcellError) {
+    console.error(error.code, error.status, error.message);
+  } else {
+    throw error;
+  }
+}
+</code></pre>
+        <p>
+          SDK methods do not prompt or print. Provide <code>manualAnswer</code> when automatic math
+          may need help:
+        </p>
+        <pre data-lang="TypeScript"><code>await app.math({
+  count: 1,
+  manualAnswer: async (question) =&gt; {
+    return getAnswerFromYourInterface(question);
+  },
+  onEvent: (event) =&gt; {
+    if (event.event === 'answer') showAnswerInYourInterface(event.result);
+  },
+});
+</code></pre>
+        <p>
+          <code>getAnswerFromYourInterface</code> and
+          <code>showAnswerInYourInterface</code> represent your own UI functions. Without a handler,
+          unsupported math rejects with <code>MANUAL_ANSWER_REQUIRED</code> and the question in
+          <code>error.response</code>; it does not guess an answer. A supplied answer must match an
+          option.
+        </p>
+        <p>
+          <code>spin</code>, <code>scratch</code> and <code>math</code> return
+          <code>{ games, results, stop }</code>. Their <code>onEvent</code> callback receives
+          <code>game_start</code>, <code>wait</code>, <code>answer</code> and
+          <code>result</code> events. Callbacks are awaited before the next request. Calling another
+          operation on the same app instance from inside a callback rejects with
+          <code>REENTRANT_COMMAND</code>. Keep callbacks focused on handling events, and run the
+          next SDK command after the current one finishes.
+        </p>
+        <h3 id="sdk-methods">Methods</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Purpose</th>
+                <th>Methods</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>OTP login</td>
+                <td>
+                  <code>requestOtp(number)</code>,
+                  <code>verifyOtp(number, otp, { activate?: boolean })</code>
+                </td>
+              </tr>
+              <tr>
+                <td>Saved accounts</td>
+                <td>
+                  <code>listAccounts()</code>, <code>switchAccount(number)</code>,
+                  <code>removeAccount(number)</code>, <code>logout()</code>
+                </td>
+              </tr>
+              <tr>
+                <td>Session</td>
+                <td><code>status()</code>, <code>refresh()</code></td>
+              </tr>
+              <tr>
+                <td>Account details</td>
+                <td><code>balance()</code>, <code>profile()</code></td>
+              </tr>
+              <tr>
+                <td>Plans</td>
+                <td>
+                  <code>categories()</code>, <code>plans({ category?, keyword?, sort? })</code>,
+                  <code>subscribe(id, category?)</code>
+                </td>
+              </tr>
+              <tr>
+                <td>SMS</td>
+                <td><code>sendFreeSms(number, text)</code></td>
+              </tr>
+              <tr>
+                <td>Game rewards</td>
+                <td>
+                  <code>checkIn()</code>, <code>taskStatus()</code>,
+                  <code>claimTasks(idsOrAll, onTask?)</code>, <code>ranks()</code>
+                </td>
+              </tr>
+              <tr>
+                <td>Games</td>
+                <td>
+                  <code>spin(options?)</code>, <code>scratch(options?)</code>,
+                  <code>math(options?)</code>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Set <code>{ activate: false }</code> when verifying an added account to preserve the
+          active account. <code>claimTasks([1, 2])</code> or <code>claimTasks('all')</code> returns
+          <code>{ results, failed }</code>; inspect <code>failed</code> for rejected claims. Game
+          results preserve server fields. Rankings return parsed performance, prizes and players,
+          including <code>is_you</code>.
+        </p>
+        <h3 id="sdk-stores">In-memory and custom stores</h3>
+        <pre
+          data-lang="TypeScript"
+        ><code>import { createNcellApp, MemorySessionStore } from 'ncell';
+
+const app = createNcellApp({ store: new MemorySessionStore() });
+</code></pre>
+        <p>
+          An in-memory store lasts only as long as the process. Log in through
+          <code>requestOtp</code> and <code>verifyOtp</code>, or initialize the store with a typed
+          <code>Session</code> obtained through your own secure storage.
+        </p>
+        <p>
+          You can implement the exported <code>SessionStore</code> interface with
+          <code>load()</code>, <code>save(session)</code> and <code>clear()</code>. Optional
+          <code>withLock(operation)</code> lets a store protect transactions across instances or
+          processes. Use a secure store for persistent tokens. <code>NcellOptions</code>,
+          <code>Session</code>, <code>Account</code>, <code>PlayOptions</code> and other public
+          types are exported from <code>ncell</code>.
+        </p>
+        <p>
+          You can inject <code>fetch</code> for tests or a custom transport. SDK operations on an
+          instance run sequentially, so account changes and game balances stay ordered.
+        </p>
+        <h3 id="sdk-cli">Embed the CLI or script tools</h3>
+        <pre data-lang="TypeScript"><code>import { runCli } from 'ncell/cli';
+import { createNcellApp, MemorySessionStore } from 'ncell';
+
+await runCli(['game', 'status'], {
+  app: createNcellApp({ store: new MemorySessionStore() }),
+});
+</code></pre>
+        <p>
+          Log in before calling authenticated commands. <code>runCli</code> accepts injectable app,
+          script library and terminal I/O. The main package also exports <code>ScriptLibrary</code>,
+          <code>parseScript</code>, <code>executeScript</code> and <code>tokenize</code> for custom
+          runners.
+        </p>
+        <h2 id="commands">Command reference</h2>
+        <p>
+          Commands use words. Required targets are positional arguments. Optional settings use
+          <code>--long-options</code>. Use <code>-h</code> or <code>--help</code> for help and
+          <code>-V</code> or <code>--version</code> for the version.
+        </p>
+
+        <div id="command-groups">
+          <section class="code-section" aria-labelledby="commands-session">
+            <div class="code-heading">
+              <h3 id="commands-session">Session</h3>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Command</th>
+
+                    <th scope="col">Arguments / options</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td><code>login</code></td>
+
+                    <td><code>&lt;number&gt; [--verify]</code></td>
+                  </tr>
+
+                  <tr>
+                    <td><code>logout</code></td>
+
+                    <td>Remove the active saved account</td>
+                  </tr>
+
+                  <tr>
+                    <td><code>account add</code></td>
+                    <td><code>&lt;number&gt; [--verify]</code> - save without switching</td>
+                  </tr>
+                  <tr>
+                    <td><code>account remove</code></td>
+                    <td><code>&lt;number&gt;</code> - remove a saved account</td>
+                  </tr>
+                  <tr>
+                    <td><code>account list</code></td>
+                    <td>List saved accounts and show the active account</td>
+                  </tr>
+
+                  <tr>
+                    <td><code>account switch</code></td>
+                    <td><code>&lt;number&gt;</code> — switch without an OTP</td>
+                  </tr>
+
+                  <tr>
+                    <td><code>status</code></td>
+
+                    <td>Local session</td>
+                  </tr>
+
+                  <tr>
+                    <td><code>refresh</code></td>
+
+                    <td>Rotate saved tokens</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="code-section" aria-labelledby="commands-account">
+            <div class="code-heading">
+              <h3 id="commands-account">Account</h3>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Command</th>
+
+                    <th scope="col">Arguments / options</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td><code>balance</code></td>
+
+                    <td>Account balance summary</td>
+                  </tr>
+
+                  <tr>
+                    <td><code>profile</code></td>
+
+                    <td>Profile summary</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="code-section" aria-labelledby="commands-plans">
+            <div class="code-heading">
+              <h3 id="commands-plans">Plans</h3>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Command</th>
+
+                    <th scope="col">Arguments / options</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td><code>plans</code></td>
+
+                    <td>
+                      <code>[--category &lt;id&gt;] [--sort &lt;keys&gt;]</code>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><code>plans categories</code></td>
+
+                    <td>List plan categories</td>
+                  </tr>
+
+                  <tr>
+                    <td><code>plans search</code></td>
+
+                    <td>
+                      <code>&lt;keyword&gt; [--category &lt;id&gt;] [--sort &lt;keys&gt;]</code>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><code>plans subscribe</code></td>
+
+                    <td>
+                      <code>&lt;plan-id&gt; [--category &lt;id&gt;]</code>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="code-section" aria-labelledby="commands-sms">
+            <div class="code-heading">
+              <h3 id="commands-sms">SMS</h3>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Command</th>
+
+                    <th scope="col">Arguments / options</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td><code>sms send-free</code></td>
+
+                    <td>
+                      <code>&lt;number&gt; &lt;text&gt;</code>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="code-section" aria-labelledby="commands-games">
+            <div class="code-heading">
+              <h3 id="commands-games">Games</h3>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Command</th>
+
+                    <th scope="col">Arguments / options</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td><code>game check-in</code></td>
+
+                    <td>Claim the daily check-in reward</td>
+                  </tr>
+
+                  <tr>
+                    <td><code>game claim-task</code></td>
+
+                    <td>
+                      <code>&lt;ids|all&gt;</code> - comma-separated or space-separated task IDs
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><code>game status</code></td>
+
+                    <td>List tasks, progress and rewards</td>
+                  </tr>
+
+                  <tr>
+                    <td><code>game ranks</code></td>
+
+                    <td>Weekly performance, prizes and leaderboard</td>
+                  </tr>
+
+                  <tr>
+                    <td><code>game spin</code></td>
+
+                    <td><code>[--count &lt;number|all&gt;] [--delay &lt;duration&gt;]</code></td>
+                  </tr>
+
+                  <tr>
+                    <td><code>game scratch</code></td>
+
+                    <td><code>[--count &lt;number|all&gt;] [--delay &lt;duration&gt;]</code></td>
+                  </tr>
+
+                  <tr>
+                    <td><code>game math</code></td>
+
+                    <td><code>[--count &lt;number|all&gt;] [--delay &lt;duration&gt;]</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="code-section" aria-labelledby="commands-scripts">
+            <div class="code-heading">
+              <h3 id="commands-scripts">Scripts</h3>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Command</th>
+                    <th>Arguments / options</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>script create</code></td>
+                    <td><code>&lt;file&gt;</code> — create an editable example</td>
+                  </tr>
+                  <tr>
+                    <td><code>script list</code></td>
+                    <td>List scripts saved in the CLI</td>
+                  </tr>
+                  <tr>
+                    <td><code>script edit</code></td>
+                    <td><code>&lt;file-name&gt;</code> — open a saved script in your editor</td>
+                  </tr>
+                  <tr>
+                    <td><code>script delete</code></td>
+                    <td><code>&lt;file-name&gt;</code> — delete a saved script</td>
+                  </tr>
+                  <tr>
+                    <td><code>script run</code></td>
+                    <td><code>&lt;file&gt;</code> — validate and run commands in order</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section class="code-section" aria-labelledby="commands-help">
+            <div class="code-heading">
+              <h3 id="commands-help">Global commands</h3>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Command</th>
+
+                    <th scope="col">Description</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td><code>--help</code></td>
+
+                    <td>Shows help information</td>
+                  </tr>
+
+                  <tr>
+                    <td><code>&lt;command&gt; --help</code></td>
+
+                    <td>Shows usage for a specific command</td>
+                  </tr>
+
+                  <tr>
+                    <td><code>--version</code></td>
+
+                    <td>Shows CLI version</td>
+                  </tr>
+
+                  <tr>
+                    <td><code>--json</code></td>
+
+                    <td>Outputs the complete JSON response</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+        <h2 id="output">Output and errors</h2>
+        <p>
+          Normal CLI output uses aligned tables and terminal colors. Dates display in Nepal time
+          using a 12-hour clock. <code>NO_COLOR=1</code> disables colors.
+        </p>
+        <p>
+          <code>--json</code> works on every command and prints indented JSON. Repeated games and
+          scripts emit separate JSON objects as results arrive. Parse it as a JSON stream rather
+          than one combined document. Script results include the step, total, physical file line and
+          command; JSON mode also emits a completion event.
+        </p>
+        <p>
+          SDK data is returned directly, without terminal formatting. Balance and profile expose
+          their API response body; game rewards retain server fields. Account status and login
+          results contain metadata, not tokens. <code>NcellError</code> includes <code>code</code>,
+          optional HTTP <code>status</code>, and the server <code>response</code> when available.
+        </p>
+        <p>See the <a href="#commands">command reference</a> for all commands and options.</p>
+        <h2 id="development">Development and tests</h2>
+        <pre data-lang="Shell"><code>npm run check
+npm run format:check
+</code></pre>
+        <p>
+          <code>check</code> runs strict TypeScript checking, the test suite and the build. Tests
+          live in <code>tests/</code>, not in production source files. Injected fetch responses
+          cover authentication, account storage, purchases, SMS, games and script execution without
+          sending messages or buying packs. Live server checks are separate from this test suite.
+        </p>
+        <p>
+          See
+          <a href="https://github.com/rohityadav-sas/ncell-app/blob/main/docs/testing.md"
+            >verification results</a
+          >
+          for platform coverage, package checks and live-test limits.
+        </p>
+      </article>
+
+      <footer class="page-footer">
+        <p>ncell v0.1.0 <span class="footer-dot">·</span> MIT licensed</p>
+
+        <a href="https://github.com/rohityadav-sas/ncell-app"
+          ><svg class="ico ico-fill" aria-hidden="true">
+            <use href="#i-github" /></svg
+          ><span>View source on GitHub</span></a
+        >
+      </footer>
+    </main>
+
+    <dialog id="search-dialog" aria-label="Search documentation">
+      <div class="search-head">
+        <svg class="ico" aria-hidden="true">
+          <use href="#i-search" />
+        </svg>
+
+        <input
+          id="search-input"
+          type="search"
+          placeholder="Search documentation"
+          autocomplete="off"
+          spellcheck="false"
+          role="combobox"
+          aria-label="Search documentation"
+          aria-expanded="false"
+          aria-controls="search-results"
+          aria-autocomplete="list"
+        />
+
+        <kbd>Esc</kbd>
+      </div>
+
+      <p id="search-status" class="search-hint" role="status"></p>
+
+      <ul id="search-results" role="listbox" aria-label="Search results"></ul>
+
+      <div class="search-foot">
+        <span
+          ><kbd
+            ><svg class="ico" aria-hidden="true">
+              <use href="#i-arrow-up" /></svg></kbd
+          ><kbd
+            ><svg class="ico" aria-hidden="true">
+              <use href="#i-arrow-down" /></svg
+          ></kbd>
+
+          to navigate</span
+        >
+
+        <span
+          ><kbd
+            ><svg class="ico" aria-hidden="true">
+              <use href="#i-corner-down-left" /></svg
+          ></kbd>
+
+          to open</span
+        >
+
+        <span><kbd>Esc</kbd> to close</span>
+      </div>
+    </dialog>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>

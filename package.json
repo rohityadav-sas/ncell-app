@@ -1,0 +1,78 @@
+{
+  "name": "ncell",
+  "version": "0.1.0",
+  "description": "Ncell account SDK and command-line interface",
+  "author": "Rohit Yadav",
+  "keywords": [
+    "ncell",
+    "nepal",
+    "cli",
+    "sdk",
+    "typescript",
+    "automation"
+  ],
+  "homepage": "https://rohityadav-sas.github.io/ncell-app/",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "bin": {
+    "ncell": "dist/cli/main.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./cli": {
+      "types": "./dist/cli/program.d.ts",
+      "import": "./dist/cli/program.js"
+    }
+  },
+  "files": [
+    "dist",
+    "docs",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "check": "npm run typecheck && npm test && npm run build",
+    "format": "prettier --write src tests docs *.json *.md",
+    "format:check": "prettier --check src tests docs *.json *.md",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run check && npm run format:check"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "@napi-rs/keyring": "^2.1.1",
+    "commander": "^15.0.0",
+    "linkedom": "^0.18.13",
+    "picocolors": "^1.1.1",
+    "proper-lockfile": "^4.1.2",
+    "tough-cookie": "^6.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/proper-lockfile": "^4.1.4",
+    "prettier": "^3.9.10",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rohityadav-sas/ncell-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rohityadav-sas/ncell-app/issues"
+  }
+}
