@@ -34,6 +34,38 @@ export function fit(value: string, cells: number): string {
   return result;
 }
 
+/** Split a notice into display-cell-bounded lines without breaking words. */
+function wrapNotice(value: string, cells: number): string[] {
+  const lines: string[] = [];
+  let line = '';
+  const cut = (word: string): void => {
+    let piece = '';
+    for (const char of word) {
+      if (piece && cellWidth(piece + char) > cells) {
+        lines.push(piece);
+        piece = '';
+      }
+      piece += char;
+    }
+    if (piece) lines.push(piece);
+  };
+  for (const word of value.split(/\s+/).filter(Boolean)) {
+    const candidate = line ? `${line} ${word}` : word;
+    if (cellWidth(candidate) <= cells) {
+      line = candidate;
+    } else {
+      if (line) {
+        lines.push(line);
+        line = '';
+      }
+      if (cellWidth(word) <= cells) line = word;
+      else cut(word);
+    }
+  }
+  if (line) lines.push(line);
+  return lines.length ? lines : [''];
+}
+
 export class InteractiveTheme {
   constructor(readonly color = true) {}
   paint(rgb: string, value: string): string {
@@ -151,6 +183,12 @@ export class InteractiveTheme {
         ? 64
         : Math.max(28, ...visible.map((item) => nameWidth + cellWidth(item.description) + 6)),
     );
+    const noticeText =
+      completion.notice ??
+      (completion.packPanel ? 'No matching packs.' : 'No matching categories.');
+    // Word-wrap long notices across the reserved empty rows instead of cutting
+    // them off; the box keeps its fixed size so nothing shifts while typing.
+    const noticeLines = !items.length ? wrapNotice(noticeText, Math.max(1, inner - 2)) : [];
     const left = Math.max(0, Math.min(anchor, columns - inner - 2));
     const indent = ' '.repeat(left);
     const rows = [indent + this.border('┌' + '─'.repeat(inner) + '┐')];
@@ -196,9 +234,8 @@ export class InteractiveTheme {
     }
     for (let index = count; index < slots; index++) {
       const notice =
-        !items.length && index === 0
-          ? (completion.notice ??
-            (completion.packPanel ? 'No matching packs.' : 'No matching categories.'))
+        !items.length && index - count < noticeLines.length
+          ? (noticeLines[index - count] ?? '')
           : '';
       const text = fit('  ' + notice, inner);
       rows.push(

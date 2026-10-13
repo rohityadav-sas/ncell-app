@@ -1,11 +1,6 @@
 import { spawn } from 'node:child_process';
 import type { ChildProcess } from 'node:child_process';
-import {
-  createInterface,
-  cursorTo,
-  clearScreenDown,
-  emitKeypressEvents,
-} from 'node:readline';
+import { createInterface, cursorTo, clearScreenDown, emitKeypressEvents } from 'node:readline';
 import type { Key } from 'node:readline';
 import type { Completion, CompletionEngine } from './completion.js';
 import { InteractiveEditor } from './interactive-editor.js';
