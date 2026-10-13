@@ -421,6 +421,10 @@
             <use href="#i-download" /></svg
           ><span>Installation</span></a
         >
+        <a href="#interactive"
+          ><svg class="ico" aria-hidden="true"><use href="#i-terminal" /></svg
+          ><span>Interactive mode</span></a
+        >
         <p class="nav-title">Accounts</p>
         <a href="#login"
           ><svg class="ico" aria-hidden="true">
@@ -666,6 +670,68 @@
           For a headless Node.js application, provide an
           <a href="#sdk-stores">in-memory or custom session store</a>. This package currently
           targets Node.js.
+        </p>
+
+        <h2 id="interactive">Interactive mode</h2>
+        <p>
+          Open an interactive command prompt with live dropdown suggestions. No shell profile setup
+          is needed.
+        </p>
+        <pre data-lang="Shell"><code>ncell interactive</code></pre>
+        <p>
+          Type <code>ga</code> to suggest <code>game</code>, then <code>sp</code> to suggest
+          <code>spin</code>. Suggestions stay hidden at an empty prompt until you press
+          <kbd>Ctrl+Space</kbd>.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Key</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Ctrl+Space</td>
+              <td>Show suggestions for the current word or next argument</td>
+            </tr>
+            <tr>
+              <td>Up / Down</td>
+              <td>Select a suggestion, or browse command history when the dropdown is closed</td>
+            </tr>
+            <tr>
+              <td>Tab / Enter</td>
+              <td>Accept the selected suggestion; Enter runs a complete command</td>
+            </tr>
+            <tr>
+              <td>Esc</td>
+              <td>Dismiss suggestions while keeping the command and argument hints</td>
+            </tr>
+            <tr>
+              <td>Ctrl+A</td>
+              <td>Select the whole command; typing replaces it</td>
+            </tr>
+            <tr>
+              <td>Ctrl+Backspace</td>
+              <td>Delete the previous word</td>
+            </tr>
+            <tr>
+              <td>Ctrl+C / exit</td>
+              <td>Close interactive mode</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          Use the same commands as the normal CLI, without the <code>ncell</code> prefix. Required
+          argument hints, plan sort directions and comma-separated fields are shown as you type.
+          Category values come from the active account's catalog. Saved <code>.ncell</code> files
+          are suggested for script commands.
+        </p>
+        <p>
+          Commands run against your saved account. Sending an SMS, subscribing to a plan and playing
+          games have the same effects as their normal CLI commands. This is a live command prompt.
+          It requires an interactive terminal; use ordinary commands and <code>--json</code> for
+          automation.
         </p>
 
         <h2 id="login">Authentication</h2>

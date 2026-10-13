@@ -3,11 +3,20 @@ import { createInterface } from 'node:readline/promises';
 import { NcellApp, parseCount } from '../app.js';
 import type { GameKind } from '../app.js';
 import { NcellError } from '../core/index.js';
-import { ScriptLibrary, ScriptExecutionError, parseScript, executeScript } from '../scripts.js';
+import {
+  ScriptLibrary,
+  ScriptExecutionError,
+  parseScript,
+  executeScript,
+  tokenize,
+} from '../scripts.js';
 import { CommanderError } from 'commander';
 import { Formatter } from './format.js';
 import { parseCommand } from './parse.js';
 import type { ParsedCommand } from './parse.js';
+import { CompletionEngine } from './completion.js';
+import { runInteractive } from './interactive.js';
+import type { InteractiveSession } from './interactive.js';
 
 export interface CliIO {
   out: (text: string) => void;
@@ -20,6 +29,8 @@ export interface CliOptions {
   app?: NcellApp;
   scripts?: ScriptLibrary;
   io?: Partial<CliIO>;
+  /** Alternate terminal driver for embedders and deterministic integration tests. */
+  interactive?: (session: InteractiveSession) => Promise<void>;
 }
 interface Context {
   app: NcellApp;
@@ -115,11 +126,7 @@ async function execute(command: ParsedCommand, context: Context): Promise<void> 
     }
     case 'refresh': {
       const response = await app.refresh();
-      result(context, command, response, () =>
-        format.message(
-          'Refreshed tokens saved in your system credential store.\nIf this session is shared with the app, synchronize the rotated tokens back.',
-        ),
-      );
+      result(context, command, response, () => format.message('Tokens refreshed.'));
       return;
     }
     case 'balance': {
@@ -294,6 +301,8 @@ async function execute(command: ParsedCommand, context: Context): Promise<void> 
         const parsed = parseCommand(argv, { out: () => {}, err: () => {} });
         if (parsed.command.startsWith('script '))
           throw new Error('Nested script commands are not supported');
+        if (parsed.command === 'interactive')
+          throw new Error('Interactive mode cannot run inside a script');
         return parsed;
       });
       await executeScript(steps, async (step, index, total) => {
@@ -345,6 +354,51 @@ export async function runCli(argv: string[], options: CliOptions = {}): Promise<
     io,
     formatter: new Formatter({ write: io.out, color: io.color }),
   };
+  if (command.command === 'interactive') {
+    if (command.json) throw new Error('Interactive mode does not support --json');
+    const completion = new CompletionEngine({
+      categories: () => context.app.categories(),
+      plans: (category) => context.app.plans({ category }),
+      scripts: context.scripts,
+    });
+    await (options.interactive ?? runInteractive)({
+      completion,
+      out: io.out,
+      color: io.color,
+      execute: async (line) => {
+        const args = tokenize(line);
+        if (args[0] === 'ncell') args.shift();
+        if (!args.length) return;
+        let parsed: ParsedCommand;
+        try {
+          parsed = parseCommand(args, { out: io.out, err: () => {} });
+        } catch (error) {
+          if (error instanceof CommanderError && error.exitCode === 0) return;
+          throw error;
+        }
+        if (parsed.command === 'interactive') throw new Error('Already in interactive mode');
+        try {
+          await runCli(args, { ...options, app: context.app, scripts: context.scripts, io });
+        } catch (error) {
+          if (!(error instanceof CommanderError && error.exitCode === 0)) throw error;
+        } finally {
+          if (
+            [
+              'login',
+              'logout',
+              'refresh',
+              'script run',
+              'plans categories',
+              'plans subscribe',
+            ].includes(parsed.command) ||
+            parsed.command.startsWith('account ')
+          )
+            completion.invalidate();
+        }
+      },
+    });
+    return;
+  }
   await execute(command, context);
 }
 

@@ -4,6 +4,7 @@ import { createRequire } from 'node:module';
 import { parseCount, parseDelay } from '../app.js';
 
 const { version } = createRequire(import.meta.url)('../../package.json') as { version: string };
+export const SORT_FIELDS = ['price', 'validity'] as const;
 
 export interface ParsedCommand {
   command: string;
@@ -25,7 +26,8 @@ function positive(value: string): number {
 }
 
 function sortFields(value: string): string {
-  if (!/^(price|validity)(:(asc|desc))?(,(price|validity)(:(asc|desc))?)*$/.test(value)) {
+  const field = `(${SORT_FIELDS.join('|')})(:(asc|desc))?`;
+  if (!new RegExp(`^${field}(,${field})*$`).test(value)) {
     throw new InvalidArgumentError(
       'Sort fields must be price or validity, optionally followed by :asc or :desc',
     );
@@ -39,7 +41,8 @@ export function createProgram(
 ): Command {
   const program = new Command('ncell')
     .description('Ncell account CLI')
-    .version(version)
+    .version(version, '-V, --version', 'Print version')
+    .helpOption('-h, --help', 'Print help')
     .option('--json', 'Print structured JSON output')
     .exitOverride()
     .showHelpAfterError();
@@ -66,88 +69,85 @@ export function createProgram(
     };
   const login = program
     .command('login')
-    .description('Request an SMS code and log in. Use --verify to resume a pending login')
-    .argument('<number>')
-    .option('--verify', 'Resume a pending OTP')
+    .description('Request an OTP and log in. Use --verify to resume a pending login')
+    .argument('<number>', 'Ncell number')
+    .option('--verify', '')
     .action(action('login'));
   void login;
   const account = program.command('account').description('Manage saved accounts');
   account
     .command('add')
     .description('Save an account without switching')
-    .argument('<number>')
-    .option('--verify', 'Resume a pending OTP')
+    .argument('<number>', 'Ncell number')
+    .option('--verify', '')
     .action(action('account add'));
   account.command('list').description('List saved accounts').action(action('account list'));
   account
     .command('switch')
     .description('Switch to a saved account')
-    .argument('<number>')
+    .argument('<number>', 'Ncell number')
     .action(action('account switch'));
   account
     .command('remove')
     .description('Remove a saved account locally')
-    .argument('<number>')
+    .argument('<number>', 'Ncell number')
     .action(action('account remove'));
   program.command('status').description('Show local session status').action(action('status'));
-  program
-    .command('logout')
-    .description('Remove the active account locally')
-    .action(action('logout'));
-  program.command('refresh').description('Rotate saved tokens').action(action('refresh'));
+  program.command('logout').description('Remove the active account').action(action('logout'));
+  program.command('refresh').description('Rotate tokens').action(action('refresh'));
   program
     .command('balance')
-    .description('Query balances and pack details')
+    .description('Query balance, data, voice and SMS')
     .action(action('balance'));
-  program.command('profile').description('Query the subscriber profile').action(action('profile'));
-  const sms = program.command('sms').description('Send SMS messages');
+  program.command('profile').description('Owner Information').action(action('profile'));
+  const sms = program.command('sms').description('Send SMS');
   sms
     .command('send-free')
-    .description('Send a free SMS')
-    .argument('<number>')
-    .argument('<text>')
+    .description('Send a free SMS to a Ncell number')
+    .argument('<number>', 'Ncell number')
+    .argument('<text>', 'SMS message; use double quotes for spaces')
     .action(action('sms send-free'));
   const plans = program
     .command('plans')
     .description('Browse, search and subscribe to plans')
-    .option('--category <id>', 'Catalog category', positive, DEFAULT_PLAN_CATEGORY)
-    .option(
-      '--sort <fields>',
-      'Ordered price/validity fields with :asc or :desc',
-      sortFields,
-      'price',
-    )
+    .option('--category <id>', '', positive, DEFAULT_PLAN_CATEGORY)
+    .option('--sort <fields>', 'Sort by a column', sortFields, 'price')
     .action(action('plans'));
   plans
     .command('categories')
-    .description('List catalog categories')
+    .description('List plans categories')
     .action(action('plans categories'));
   plans
     .command('search')
     .description('Search plans within a category')
-    .argument('<keyword>')
-    .option('--category <id>', 'Catalog category', positive, DEFAULT_PLAN_CATEGORY)
-    .option('--sort <fields>', 'Ordered price/validity fields', sortFields, 'price')
+    .argument('<keyword>', 'Search query; use double quotes for spaces')
+    .option('--category <id>', '', positive, DEFAULT_PLAN_CATEGORY)
+    .option('--sort <fields>', 'Sort by a column', sortFields, 'price')
     .action(action('plans search'));
   plans
     .command('subscribe')
-    .description('Subscribe to a plan. Paid packs charge your Ncell account')
-    .argument('<id>')
-    .option('--category <id>', 'Catalog category', positive, DEFAULT_PLAN_CATEGORY)
+    .description('Subscribe to a plan')
+    .argument('<id>', 'Plan ID from the plans list')
+    .option('--category <id>', '', positive, DEFAULT_PLAN_CATEGORY)
     .action(action('plans subscribe'));
   const game = program.command('game').description('Game status, rewards and leaderboard');
   for (const kind of ['spin', 'scratch', 'math']) {
     game
       .command(kind)
-      .description(`Play ${kind} using game tokens`)
-      .option('--count <count>', 'Number of games, or all', parseCount, 1)
-      .option('--delay <duration>', 'Delay between games: seconds or s, m, h', parseDelay, 0)
+      .description(`Play ${kind} game`)
+      .option('--count <count>', 'Number of games to play', parseCount, 1)
+      .option(
+        '--delay <duration>',
+        'Delay between games: seconds by default, or use s, m, h (e.g. 1.5m)',
+        parseDelay,
+        0,
+      )
       .action(action(`game ${kind}`));
   }
   const gameDescriptions = {
-    'check-in': 'Claim the daily check-in reward',
-    status: 'List tasks, progress and rewards',
-    ranks: 'Show your performance, prizes and leaderboard',
+    'check-in': 'Claim daily check-in reward',
+    status: 'List game tasks, rewards and current progress',
+    ranks: 'Show weekly ranks, performance and prizes',
   };
   for (const [name, description] of Object.entries(gameDescriptions)) {
     game
@@ -157,30 +157,33 @@ export function createProgram(
   }
   game
     .command('claim-task')
-    .description('Claim task IDs or all completed, unclaimed tasks')
-    .argument('<ids...>')
+    .description('Claim tasks')
+    .argument('<ids...>', 'Task IDs separated by commas')
     .action(action('game claim-task'));
-  const script = program
-    .command('script')
-    .description('Create, manage and run saved command scripts');
+  const script = program.command('script').description('Manage reusable scripts');
   const scriptDescriptions = {
-    create: 'Create a saved script and open it in your text editor',
-    run: 'Validate and run a saved script or command file',
-    edit: 'Open a saved script in your text editor',
-    delete: 'Delete a saved script',
+    create: 'Create a script',
+    run: 'Run a script',
+    edit: 'Open a script',
+    delete: 'Delete a script',
   };
   for (const [name, description] of Object.entries(scriptDescriptions)) {
     script
       .command(name)
       .description(description)
-      .argument('<file>')
+      .argument('<file>', 'Script name or path; use double quotes for spaces')
       .action(action(`script ${name}`));
   }
   script.command('list').description('List saved scripts').action(action('script list'));
+  program
+    .command('interactive')
+    .description('Open the interactive command editor with live suggestions')
+    .action(action('interactive'));
   // Commander scopes parent options when positional parsing is enabled.
   // Declare the global flag on descendants so it also works after any command.
   const globals = (parent: Command): void => {
     for (const child of parent.commands) {
+      child.helpOption('-h, --help', 'Print help');
       child.option('--json', 'Print structured JSON output');
       globals(child);
     }

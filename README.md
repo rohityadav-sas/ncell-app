@@ -29,6 +29,14 @@ ID      Plan                             Price    Validity
 987     28 Day : 850 All Net SMS       Rs. 125      28 DAY
 ```
 
+## Interactive mode
+
+```sh
+ncell interactive
+```
+
+Live dropdown completion, argument hints, script files and plan categories are available without shell setup. Commands execute against your saved account. See the [interactive guide](https://rohityadav-sas.github.io/ncell-app/#interactive).
+
 ## Installation
 
 Requires Node.js 22.12 or newer. Works on Windows, macOS and Linux.

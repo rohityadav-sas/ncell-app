@@ -14,6 +14,12 @@ Commands and subcommands use words. Required targets, such as an account number 
 
 Set `NO_COLOR=1` to disable terminal colors. Normal dates use Nepal time and a 12-hour clock.
 
+## Interactive mode
+
+Run `ncell interactive` to open the live dropdown prompt. Type commands without the `ncell` prefix. Ctrl+Space requests suggestions, Up/Down selects a match, and Tab or Enter accepts it. Enter on a completed command executes it. Esc closes only the dropdown; argument hints remain. Ctrl+A selects the line, Ctrl+Backspace deletes the previous word, and Ctrl+C or `exit` closes the prompt.
+
+Categories are loaded from the active account. Script filenames come from the script library and current directory. Commands run normally, including account changes, SMS, subscriptions and games. An interactive terminal is required; use one-shot CLI commands for redirected input and automation.
+
 ## Accounts
 
 | Command                                 | Arguments and behavior                                                                                |
