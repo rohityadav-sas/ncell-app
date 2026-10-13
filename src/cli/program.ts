@@ -1,3 +1,4 @@
+import { DEFAULT_PLAN_CATEGORY } from '../core/catalog.js';
 import { createInterface } from 'node:readline/promises';
 import { NcellApp, parseCount } from '../app.js';
 import type { GameKind } from '../app.js';
@@ -149,7 +150,7 @@ async function execute(command: ParsedCommand, context: Context): Promise<void> 
     case 'plans':
     case 'plans search': {
       const response = await app.plans({
-        category: command.category ?? 66,
+        category: command.category ?? DEFAULT_PLAN_CATEGORY,
         keyword: command.command === 'plans search' ? number : '',
         ...(command.sort ? { sort: command.sort } : {}),
       });
@@ -157,7 +158,7 @@ async function execute(command: ParsedCommand, context: Context): Promise<void> 
       return;
     }
     case 'plans subscribe': {
-      const response = await app.subscribe(number, command.category ?? 66);
+      const response = await app.subscribe(number, command.category ?? DEFAULT_PLAN_CATEGORY);
       result(context, command, response, () => format.message('Plan subscribed successfully.'));
       return;
     }

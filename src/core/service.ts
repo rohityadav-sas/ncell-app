@@ -1,3 +1,5 @@
+import { GAME_BASE_URL } from './endpoints.js';
+import { DEFAULT_PLAN_CATEGORY } from './catalog.js';
 import { createHash, randomBytes } from 'node:crypto';
 import { ApiClient, requestHeader, tokens } from './http.js';
 import { NcellError, invalidResponse, normalizeNumber, object, text } from './error.js';
@@ -327,7 +329,7 @@ export class AccountService {
 
   private async getPlans(account: Account, category: number, keyword: string): Promise<JsonObject> {
     let catalog = 'data';
-    if (category !== 66) {
+    if (category !== DEFAULT_PLAN_CATEGORY) {
       const tags = (await this.getCategories(account)).tags as unknown[];
       const tag = tags.map(object).find((item) => item.id === category);
       if (tag === undefined || !Array.isArray(tag.categories))
@@ -359,13 +361,13 @@ export class AccountService {
   }
 
   async plans(options: { category?: number; keyword?: string } = {}): Promise<JsonObject> {
-    const category = options.category ?? 66;
+    const category = options.category ?? DEFAULT_PLAN_CATEGORY;
     if (!Number.isSafeInteger(category) || category < 0)
       throw new NcellError('Category must be a nonnegative integer');
     return this.authenticated((account) => this.getPlans(account, category, options.keyword ?? ''));
   }
 
-  async subscribe(id: string, category = 66): Promise<JsonObject> {
+  async subscribe(id: string, category = DEFAULT_PLAN_CATEGORY): Promise<JsonObject> {
     if (id.trim() === '') throw new NcellError('Plan ID cannot be empty');
     if (!Number.isSafeInteger(category) || category < 0)
       throw new NcellError('Category must be a nonnegative integer');
@@ -451,7 +453,7 @@ export class AccountService {
       const encrypted = text(object(response.encryptionResponse).msisdn);
       if (!/^[A-Za-z0-9%._~-]+$/.test(encrypted)) throw invalidResponse();
       return {
-        url: `https://sajeeb.com.np/ncellapp/checkin/index.php?MSISDN=${encrypted}`,
+        url: `${GAME_BASE_URL}/index.php?MSISDN=${encrypted}`,
         identity: identity(session, account),
       };
     }, signal);

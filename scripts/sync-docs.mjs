@@ -85,6 +85,10 @@ export async function syncDocs(sourceDirectory) {
   await Promise.all(
     formatted.map((text, index) => writeFile(resolve(root, 'docs', sharedFiles[index]), text)),
   );
+  await writeFile(
+    resolve(root, 'docs/version.json'),
+    JSON.stringify({ version: pkg.version }) + '\n',
+  );
   console.log('Synchronized documentation from ncell-cli.');
 }
 

@@ -1,3 +1,4 @@
+import { DEFAULT_PLAN_CATEGORY } from '../core/catalog.js';
 import { Command, InvalidArgumentError } from 'commander';
 import { createRequire } from 'node:module';
 import { parseCount, parseDelay } from '../app.js';
@@ -109,7 +110,7 @@ export function createProgram(
   const plans = program
     .command('plans')
     .description('Browse, search and subscribe to plans')
-    .option('--category <id>', 'Catalog category', positive, 66)
+    .option('--category <id>', 'Catalog category', positive, DEFAULT_PLAN_CATEGORY)
     .option(
       '--sort <fields>',
       'Ordered price/validity fields with :asc or :desc',
@@ -125,14 +126,14 @@ export function createProgram(
     .command('search')
     .description('Search plans within a category')
     .argument('<keyword>')
-    .option('--category <id>', 'Catalog category', positive, 66)
+    .option('--category <id>', 'Catalog category', positive, DEFAULT_PLAN_CATEGORY)
     .option('--sort <fields>', 'Ordered price/validity fields', sortFields, 'price')
     .action(action('plans search'));
   plans
     .command('subscribe')
     .description('Subscribe to a plan. Paid packs charge your Ncell account')
     .argument('<id>')
-    .option('--category <id>', 'Catalog category', positive, 66)
+    .option('--category <id>', 'Catalog category', positive, DEFAULT_PLAN_CATEGORY)
     .action(action('plans subscribe'));
   const game = program.command('game').description('Game status, rewards and leaderboard');
   for (const kind of ['spin', 'scratch', 'math']) {

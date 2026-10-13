@@ -48,7 +48,9 @@
     "format:check": "prettier --check src tests scripts docs-source docs *.json *.md",
     "prepack": "npm run build",
     "prepublishOnly": "npm run check && npm run format:check",
-    "docs:sync": "node scripts/sync-docs.mjs"
+    "docs:sync": "node scripts/sync-docs.mjs",
+    "prebuild": "node scripts/sync-version.mjs",
+    "version": "node scripts/sync-version.mjs"
   },
   "publishConfig": {
     "access": "public",

@@ -1,3 +1,4 @@
+import { GAME_BASE_URL } from '../core/endpoints.js';
 import { parseHTML } from 'linkedom';
 import { CookieJar } from 'tough-cookie';
 import { NcellError } from '../core/index.js';
@@ -45,7 +46,7 @@ export interface MathOptions extends GameRequestOptions {
   manualAnswer?: (question: Data) => Promise<string>;
 }
 
-const base = 'https://sajeeb.com.np/ncellapp/checkin';
+const base = GAME_BASE_URL;
 const endpoints: GameEndpoints = {
   status: `${base}/api/challenge_status.php`,
   ranks: `${base}/ranks.php`,

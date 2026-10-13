@@ -8,3 +8,5 @@ coverage/
 *.har
 *.log
 .local/
+
+/docs/version.json
