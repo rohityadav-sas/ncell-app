@@ -98,7 +98,7 @@ export class PackCatalog {
           const name = clean(
             object(pack.displayInfo).displayName || pack.ncellName || pack.productName || 'Pack',
           );
-          const price = clean(object(pack.productOfferingPrice).price);
+          const price = clean(object(pack.productOfferingPrice).price).replace(/\.00$/, '');
           packs.set(id, {
             id,
             description: name + (price ? ` · Rs. ${price}` : ''),

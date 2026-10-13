@@ -5,7 +5,6 @@ import {
   cursorTo,
   clearScreenDown,
   emitKeypressEvents,
-  moveCursor,
 } from 'node:readline';
 import type { Key } from 'node:readline';
 import type { Completion, CompletionEngine } from './completion.js';
@@ -201,21 +200,26 @@ export async function runInteractive(session: InteractiveSession): Promise<void>
             : theme.muted(fit(hint, columns - promptWidth))),
       );
     erase();
-    // Reserve physical rows before drawing. This scrolls the prompt into view
-    // near the terminal bottom rather than leaving stale menu fragments.
-    if (rows.length) {
-      session.out('\n'.repeat(rows.length));
-      moveCursor(process.stdout, 0, -rows.length);
-      cursorTo(process.stdout, 0);
-    }
     const input =
       editor.allSelected && session.color
         ? `\x1b[48;2;51;45;73m${view.text}\x1b[0m`
         : theme.command(view.text);
-    session.out(theme.accent(visiblePrompt) + input);
-    for (const row of rows) session.out('\n' + row);
-    if (rows.length) moveCursor(process.stdout, 0, -rows.length);
-    cursorTo(process.stdout, Math.min(columns - 1, promptWidth + view.column));
+    // Paint the whole frame in one write inside a synchronized update, so the
+    // terminal never shows a half-painted frame. Sequences used: CSI 1 G (column 0),
+    // CSI 0 J (clear below), CSI n A (move up n rows). Unsupported terminals ignore
+    // the synchronized-update wrapper and still benefit from the single write.
+    // erase() above already moved to column 0 and cleared below; the reserve block
+    // below only scrolls room into view near the terminal bottom.
+    const finalColumn = Math.min(columns - 1, promptWidth + view.column);
+    let frame = '\x1b[?2026h';
+    // Reserve physical rows before drawing. This scrolls the prompt into view
+    // near the terminal bottom rather than leaving stale menu fragments.
+    if (rows.length) frame += '\n'.repeat(rows.length) + `\x1b[${rows.length}A\x1b[1G`;
+    frame += theme.accent(visiblePrompt) + input;
+    for (const row of rows) frame += '\n' + row;
+    if (rows.length) frame += `\x1b[${rows.length}A`;
+    frame += `\x1b[${finalColumn + 1}G\x1b[?2026l`;
+    session.out(frame);
   };
   const close = (error?: Error): void => {
     if (closed) return;

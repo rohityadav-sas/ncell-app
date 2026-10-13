@@ -56,19 +56,19 @@ test('failed category requests never cache a partial unique catalog and invalida
   await assert.rejects(failed.load(), /Could not load packs/);
   assert.equal(failed.items, undefined);
   assert.doesNotMatch(failed.error ?? '', /secret/);
-  let finish!: (value: unknown) => void;
+  const finishers: ((value: unknown) => void)[] = [];
   const cache = new PackCatalog(
     async () => tags,
     () =>
       new Promise((resolve) => {
-        finish = resolve;
+        finishers.push(resolve);
       }),
     () => {},
   );
   const pending = cache.load();
   await new Promise((resolve) => setImmediate(resolve));
   cache.invalidate();
-  finish(response(50));
+  for (const finish of finishers) finish(response(50));
   await assert.rejects(pending);
   assert.equal(cache.items, undefined);
   assert.equal(cache.error, undefined);

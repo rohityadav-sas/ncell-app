@@ -17,7 +17,7 @@ Tests cover every command family through the CLI and shared SDK. They include OT
 
 Script checks cover quoted arguments, comments, UTF-8, full-file validation before requests, failure stopping, account changes, saved/current-directory resolution, overwrite protection, editor hooks, deletion, progress, spacing and structured JSON.
 
-Native storage tests use disposable credential services. They verify persistence across separate processes, multi-account bindings, locking, legacy password compatibility and Windows credential-size failure handling. They do not delete real account credentials.
+Native storage tests use disposable credential services. They verify persistence across separate processes, multi-account bindings, locking, rejection of unmarked entries and Windows credential-size failure handling. They do not delete real account credentials.
 
 The packed npm archive was installed in a separate consumer project. Default and named ESM imports, CommonJS imports, exported TypeScript types, the CLI subpath, command help and version all passed on Node.js 22.12.0. That Node release prints its own experimental warning for CommonJS loading of ESM; the import succeeds.
 

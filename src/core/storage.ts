@@ -211,18 +211,14 @@ export class NativeSessionStore implements SessionStore {
       const entry = (name: string): InstanceType<typeof AsyncEntry> =>
         new AsyncEntry(this.service, name, { linux: { store: 'secret-service' } });
       // Store JSON as UTF-8 bytes: UTF-16 passwords halve Windows' blob capacity.
-      // The marker distinguishes our encoding from previously saved passwords.
       const prefix = Buffer.from('ncell-app:1\n', 'utf8');
       this.backend = {
         get: async (name) => {
-          const credential = entry(name);
-          const secret = await credential.getSecret();
+          const secret = await entry(name).getSecret();
           if (secret === null) return null;
           const bytes = Buffer.from(secret);
-          if (bytes.subarray(0, prefix.length).equals(prefix)) {
-            return new TextDecoder('utf-8', { fatal: true }).decode(bytes.subarray(prefix.length));
-          }
-          return credential.getPassword();
+          if (!bytes.subarray(0, prefix.length).equals(prefix)) throw invalidSession();
+          return new TextDecoder('utf-8', { fatal: true }).decode(bytes.subarray(prefix.length));
         },
         set: (name, value) =>
           entry(name).setSecret(Buffer.concat([prefix, Buffer.from(value, 'utf8')])),

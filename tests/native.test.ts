@@ -88,7 +88,7 @@ test(
 );
 
 test(
-  'native UTF-8 secrets read legacy entries and respect platform credential limits',
+  'native UTF-8 secrets reject unmarked entries and respect platform credential limits',
   {
     skip:
       process.env.NCELL_NATIVE_TEST !== '1'
@@ -120,6 +120,10 @@ test(
           savedAccounts: ['9812345678'],
         }),
       );
+      await assert.rejects(store.load(), /Saved session is invalid/);
+      await accountEntry.deleteCredential();
+      await index.deleteCredential();
+      await store.save({ deviceId: 'legacy-device', otherAccounts: [], account });
       assert.equal((await store.load())?.account?.accessToken, 'legacy-access');
       const session = await store.load();
       assert.ok(session?.account);

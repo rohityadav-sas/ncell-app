@@ -133,6 +133,17 @@ export class InteractiveTheme {
     const first = Math.max(0, Math.min(selected - count + 1, items.length - count));
     const visible = items.slice(first, first + count);
     const nameWidth = Math.max(0, ...items.map((item) => cellWidth(item.value)));
+    // Pack rows carry the price inside the description ("Name · Rs. 22.00").
+    // Split it into its own column so prices line up across rows.
+    const parts = items.map((item) => {
+      const marker = ' · Rs. ';
+      const at = item.description.lastIndexOf(marker);
+      return at < 0
+        ? { head: item.description, price: '' }
+        : { head: item.description.slice(0, at), price: item.description.slice(at + 3) };
+    });
+    const priceWidth = Math.max(0, ...parts.map((part) => cellWidth(part.price)));
+    const headWidth = Math.max(0, ...parts.map((part) => cellWidth(part.head)));
     const inner = Math.min(
       64,
       columns - 2,
@@ -145,11 +156,28 @@ export class InteractiveTheme {
     const rows = [indent + this.border('┌' + '─'.repeat(inner) + '┐')];
     for (const [index, item] of visible.entries()) {
       const active = first + index === selected;
+      const part = parts[first + index] ?? { head: item.description, price: '' };
       const name = fit(item.value, inner - 4);
       const padding = ' '.repeat(Math.max(0, Math.min(nameWidth, inner - 4) - cellWidth(name) + 2));
-      const description = fit(item.description, Math.max(0, inner - 4 - cellWidth(name + padding)));
+      const rest = Math.max(0, inner - 4 - cellWidth(name + padding));
+      let tail = '';
+      let colored = '';
+      if (priceWidth > 0 && rest >= priceWidth + 2) {
+        const price = part.price ? fit(part.price, priceWidth) : '';
+        const headCol = Math.min(headWidth, rest - priceWidth - (price ? 2 : 0));
+        const head = fit(part.head, headCol);
+        const gap = price ? ' '.repeat(Math.max(0, headCol - cellWidth(head) + 2)) : '';
+        const pricePad = price ? ' '.repeat(Math.max(0, priceWidth - cellWidth(price))) : '';
+        tail = head + gap + pricePad + price;
+        if (tail)
+          colored =
+            (head ? this.muted(head) : '') + gap + pricePad + (price ? this.muted(price) : '');
+      } else {
+        tail = fit(item.description, rest);
+        if (tail) colored = this.muted(tail);
+      }
       const icon = item.kind === 'option' ? '◇' : item.kind === 'file' ? '▤' : '›';
-      const plain = ' ' + icon + ' ' + name + (description ? padding + description : '');
+      const plain = ' ' + icon + ' ' + name + (tail ? padding + tail : '');
       const background = this.color ? (active ? '\x1b[48;2;51;45;73m' : '\x1b[48;2;31;29;39m') : '';
       const foreground = this.color ? '\x1b[38;2;190;174;242m' : '';
       const content =
@@ -161,7 +189,7 @@ export class InteractiveTheme {
         foreground +
         ' ' +
         name +
-        (description ? padding + this.muted(description) + background : '') +
+        (tail ? padding + colored + background : '') +
         ' '.repeat(Math.max(0, inner - cellWidth(plain))) +
         (this.color ? '\x1b[0m' : '');
       rows.push(indent + this.border('│') + content + this.border('│'));
