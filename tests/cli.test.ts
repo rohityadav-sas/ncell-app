@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { CommanderError } from 'commander';
@@ -274,7 +274,10 @@ test('invalid commands, counts, delays, destinations and task IDs fail before ex
   for (const argv of invalid) assert.throws(() => parse(argv), Error, argv.join(' '));
 });
 
-test('help and version are successful parser exits for every family', () => {
+test('help and version are successful parser exits for every family', async () => {
+  const { version } = JSON.parse(
+    await readFile(new URL('../package.json', import.meta.url), 'utf8'),
+  );
   for (const argv of [
     ['--help'],
     ['--version'],
@@ -296,6 +299,7 @@ test('help and version are successful parser exits for every family', () => {
       (error) => error instanceof CommanderError && error.exitCode === 0,
     );
     assert.ok(stdout.trim());
+    if (argv[0] === '--version') assert.equal(stdout.trim(), version);
   }
 });
 

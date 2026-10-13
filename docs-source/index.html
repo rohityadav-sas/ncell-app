@@ -1,0 +1,792 @@
+<!doctype html>
+
+<html lang="en" data-docs-name="ncell" data-docs-storage="ncell-package-docs">
+  <head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ncell documentation</title>
+
+    <meta
+      name="description"
+      content="Ncell CLI and TypeScript SDK: installation, accounts, plans, SMS, games, scripts and API reference."
+    />
+
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+
+    <meta name="theme-color" content="#100e15" media="(prefers-color-scheme: dark)" />
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+    <script>
+      (function () {
+        var theme;
+
+        try {
+          theme = localStorage.getItem('ncell-package-docs-theme');
+        } catch (e) {}
+
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
+
+    <noscript>
+      <style>
+        .search-btn,
+        .menu-btn,
+        .theme-btn,
+        .copy-btn {
+          display: none !important;
+        }
+
+        @media (max-width: 900px) {
+          #sidebar {
+            display: block;
+
+            position: static;
+
+            width: auto;
+
+            max-width: none;
+
+            border: 0;
+
+            box-shadow: none;
+          }
+
+          main {
+            padding-top: 16px;
+          }
+        }
+      </style>
+    </noscript>
+
+    <link rel="stylesheet" href="style.css" />
+
+    <link href="https://rohityadav-sas.github.io/ncell-app/" rel="canonical" />
+  </head>
+
+  <body>
+    <!-- Icons: Lucide (ISC license) and GitHub mark from Octicons (MIT license), inlined as an SVG sprite. -->
+
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
+      <symbol id="i-search" viewBox="0 0 24 24">
+        <path d="m21 21-4.34-4.34" />
+
+        <circle cx="11" cy="11" r="8" />
+      </symbol>
+
+      <symbol id="i-menu" viewBox="0 0 24 24">
+        <path d="M4 5h16" />
+
+        <path d="M4 12h16" />
+
+        <path d="M4 19h16" />
+      </symbol>
+
+      <symbol id="i-sun" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="4" />
+
+        <path d="M12 2v2" />
+
+        <path d="M12 20v2" />
+
+        <path d="m4.93 4.93 1.41 1.41" />
+
+        <path d="m17.66 17.66 1.41 1.41" />
+
+        <path d="M2 12h2" />
+
+        <path d="M20 12h2" />
+
+        <path d="m6.34 17.66-1.41 1.41" />
+
+        <path d="m19.07 4.93-1.41 1.41" />
+      </symbol>
+
+      <symbol id="i-moon" viewBox="0 0 24 24">
+        <path
+          d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"
+        />
+      </symbol>
+
+      <symbol id="i-copy" viewBox="0 0 24 24">
+        <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+
+        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+      </symbol>
+
+      <symbol id="i-check" viewBox="0 0 24 24">
+        <path d="M20 6 9 17l-5-5" />
+      </symbol>
+
+      <symbol id="i-terminal" viewBox="0 0 24 24">
+        <path d="M12 19h8" />
+
+        <path d="m4 17 6-6-6-6" />
+      </symbol>
+
+      <symbol id="i-info" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" />
+
+        <path d="M12 16v-4" />
+
+        <path d="M12 8h.01" />
+      </symbol>
+
+      <symbol id="i-triangle-alert" viewBox="0 0 24 24">
+        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+
+        <path d="M12 9v4" />
+
+        <path d="M12 17h.01" />
+      </symbol>
+
+      <symbol id="i-arrow-right" viewBox="0 0 24 24">
+        <path d="M5 12h14" />
+
+        <path d="m12 5 7 7-7 7" />
+      </symbol>
+
+      <symbol id="i-arrow-up" viewBox="0 0 24 24">
+        <path d="m5 12 7-7 7 7" />
+
+        <path d="M12 19V5" />
+      </symbol>
+
+      <symbol id="i-arrow-down" viewBox="0 0 24 24">
+        <path d="M12 5v14" />
+
+        <path d="m19 12-7 7-7-7" />
+      </symbol>
+
+      <symbol id="i-corner-down-left" viewBox="0 0 24 24">
+        <path d="M20 4v7a4 4 0 0 1-4 4H4" />
+
+        <path d="m9 10-5 5 5 5" />
+      </symbol>
+
+      <symbol id="i-hash" viewBox="0 0 24 24">
+        <line x1="4" x2="20" y1="9" y2="9" />
+
+        <line x1="4" x2="20" y1="15" y2="15" />
+
+        <line x1="10" x2="8" y1="3" y2="21" />
+
+        <line x1="16" x2="14" y1="3" y2="21" />
+      </symbol>
+
+      <symbol id="i-file-text" viewBox="0 0 24 24">
+        <path
+          d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"
+        />
+
+        <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+
+        <path d="M10 9H8" />
+
+        <path d="M16 13H8" />
+
+        <path d="M16 17H8" />
+      </symbol>
+
+      <symbol id="i-book-open" viewBox="0 0 24 24">
+        <path d="M12 5v16" />
+
+        <path
+          d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"
+        />
+      </symbol>
+
+      <symbol id="i-download" viewBox="0 0 24 24">
+        <path d="M12 15V3" />
+
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+
+        <path d="m7 10 5 5 5-5" />
+      </symbol>
+
+      <symbol id="i-log-in" viewBox="0 0 24 24">
+        <path d="m10 17 5-5-5-5" />
+
+        <path d="M15 12H3" />
+
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+      </symbol>
+
+      <symbol id="i-wallet" viewBox="0 0 24 24">
+        <path
+          d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"
+        />
+
+        <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
+      </symbol>
+
+      <symbol id="i-tag" viewBox="0 0 24 24">
+        <path
+          d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"
+        />
+
+        <circle cx="7.5" cy="7.5" r=".5" fill="currentColor" />
+      </symbol>
+
+      <symbol id="i-list-filter" viewBox="0 0 24 24">
+        <path d="M2 5h20" />
+
+        <path d="M6 12h12" />
+
+        <path d="M9 19h6" />
+      </symbol>
+
+      <symbol id="i-credit-card" viewBox="0 0 24 24">
+        <rect width="20" height="14" x="2" y="5" rx="2" />
+
+        <line x1="2" x2="22" y1="10" y2="10" />
+
+        <path d="M6 14h2" />
+      </symbol>
+
+      <symbol id="i-message-square" viewBox="0 0 24 24">
+        <path
+          d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"
+        />
+      </symbol>
+
+      <symbol id="i-braces" viewBox="0 0 24 24">
+        <path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1" />
+
+        <path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1" />
+      </symbol>
+
+      <symbol id="i-refresh-cw" viewBox="0 0 24 24">
+        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+
+        <path d="M21 3v5h-5" />
+
+        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+
+        <path d="M8 16H3v5" />
+      </symbol>
+
+      <symbol id="i-upload" viewBox="0 0 24 24">
+        <path d="M12 3v12" />
+
+        <path d="m17 8-5-5-5 5" />
+
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      </symbol>
+
+      <symbol id="i-wrench" viewBox="0 0 24 24">
+        <path
+          d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"
+        />
+      </symbol>
+
+      <symbol id="i-globe" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" />
+
+        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+
+        <path d="M2 12h20" />
+      </symbol>
+
+      <symbol id="i-code-xml" viewBox="0 0 24 24">
+        <path d="m18 16 4-4-4-4" />
+
+        <path d="m6 8-4 4 4 4" />
+
+        <path d="m14.5 4-5 16" />
+      </symbol>
+
+      <symbol id="i-shield-check" viewBox="0 0 24 24">
+        <path
+          d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+        />
+
+        <path d="m9 12 2 2 4-4" />
+      </symbol>
+
+      <symbol id="i-smartphone" viewBox="0 0 24 24">
+        <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+
+        <path d="M12 18h.01" />
+      </symbol>
+
+      <symbol id="i-table-2" viewBox="0 0 24 24">
+        <path d="M3 9h18" />
+
+        <path d="M9 3v18" />
+
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+      </symbol>
+
+      <symbol id="i-github" viewBox="0 0 16 16">
+        <path
+          d="M6.766 11.328c-2.063-.25-3.516-1.734-3.516-3.656 0-.781.281-1.625.75-2.188-.203-.515-.172-1.609.063-2.062.625-.078 1.468.25 1.968.703.594-.187 1.219-.281 1.985-.281.765 0 1.39.094 1.953.265.484-.437 1.344-.765 1.969-.687.218.422.25 1.515.046 2.047.5.593.766 1.39.766 2.203 0 1.922-1.453 3.375-3.547 3.64.531.344.89 1.094.89 1.954v1.625c0 .468.391.734.86.547C13.781 14.359 16 11.53 16 8.03 16 3.61 12.406 0 7.984 0 3.563 0 0 3.61 0 8.031a7.88 7.88 0 0 0 5.172 7.422c.422.156.828-.125.828-.547v-1.25c-.219.094-.5.156-.75.156-1.031 0-1.64-.562-2.078-1.609-.172-.422-.36-.672-.719-.719-.187-.015-.25-.093-.25-.187 0-.188.313-.328.625-.328.453 0 .844.281 1.25.86.313.452.64.655 1.031.655s.641-.14 1-.5c.266-.265.47-.5.657-.656"
+        />
+      </symbol>
+    </svg>
+
+    <a class="skip" href="#content">Skip to content</a>
+
+    <header class="header">
+      <div class="header-inner">
+        <button
+          id="menu-btn"
+          class="icon-btn menu-btn"
+          type="button"
+          aria-label="Toggle navigation"
+          aria-expanded="false"
+          aria-controls="sidebar"
+        >
+          <svg class="ico" aria-hidden="true">
+            <use href="#i-menu" />
+          </svg>
+        </button>
+
+        <a class="brand" href="#overview">
+          <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true">
+            <rect width="64" height="64" rx="16" fill="#702da0" />
+
+            <path
+              d="m17 20 13 12-13 12m23 0h10"
+              fill="none"
+              stroke="#fff"
+              stroke-width="5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+
+          <span>ncell</span>
+        </a>
+
+        <span class="version">v{{version}}</span>
+
+        <div class="header-center">
+          <button
+            id="search-btn"
+            class="search-btn"
+            type="button"
+            aria-label="Search documentation"
+            aria-keyshortcuts="/"
+          >
+            <svg class="ico" aria-hidden="true">
+              <use href="#i-search" />
+            </svg>
+
+            <span class="search-text">Search documentation</span>
+
+            <kbd>/</kbd>
+          </button>
+        </div>
+
+        <div class="header-actions">
+          <a
+            class="icon-btn"
+            href="https://github.com/rohityadav-sas/ncell-app"
+            aria-label="ncell on GitHub"
+            ><svg class="ico ico-fill" aria-hidden="true">
+              <use href="#i-github" /></svg
+          ></a>
+
+          <button id="theme-btn" class="icon-btn theme-btn" type="button" aria-label="Switch theme">
+            <svg class="ico icon-moon" aria-hidden="true">
+              <use href="#i-moon" /></svg
+            ><svg class="ico icon-sun" aria-hidden="true">
+              <use href="#i-sun" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div id="scrim" class="scrim" hidden></div>
+
+    <aside id="sidebar">
+      <!-- shared-sidebar -->
+      <template id="package-navigation"
+        ><p class="nav-title">Package</p>
+        <a href="#sdk"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-braces" /></svg
+          ><span>Use as a package</span></a
+        ><a href="#sdk-methods"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-braces" /></svg
+          ><span>Methods</span></a
+        ><a href="#sdk-stores"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-braces" /></svg
+          ><span>Session stores</span></a
+        ><a href="#sdk-cli"
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-braces" /></svg
+          ><span>Embed the CLI</span></a
+        >
+      </template>
+    </aside>
+
+    <main>
+      <article id="content">
+        <figure id="overview" class="doc-banner">
+          <picture>
+            <source media="(max-width: 540px)" srcset="./assets/banner-mobile.svg" />
+
+            <img
+              src="./assets/banner.svg"
+              width="1200"
+              height="360"
+              alt="ncell — Your Ncell account, in your terminal and your code. TypeScript CLI and SDK for Ncell Nepal."
+            />
+          </picture>
+        </figure>
+
+        <div class="actions">
+          <a class="btn btn-primary" href="#installation"
+            ><span>Get started</span
+            ><svg class="ico" aria-hidden="true">
+              <use href="#i-arrow-right" /></svg
+          ></a>
+
+          <a class="btn btn-secondary download-btn" href="https://www.npmjs.com/package/ncell"
+            ><svg class="ico" aria-hidden="true">
+              <use href="#i-download" /></svg
+            ><span>View on npm</span></a
+          >
+        </div>
+
+        <nav class="cards" aria-label="Popular topics">
+          <a class="card" href="#installation"
+            ><span class="icon-tile"
+              ><svg class="ico" aria-hidden="true">
+                <use href="#i-download" /></svg></span
+            ><span
+              ><span class="card-title">Installation</span
+              ><span class="card-text">Install the CLI or package with npm.</span></span
+            ></a
+          >
+
+          <a class="card" href="#login"
+            ><span class="icon-tile"
+              ><svg class="ico" aria-hidden="true">
+                <use href="#i-log-in" /></svg></span
+            ><span
+              ><span class="card-title">Authentication</span
+              ><span class="card-text">Sign in with an SMS OTP.</span></span
+            ></a
+          >
+
+          <a class="card" href="#plans"
+            ><span class="icon-tile"
+              ><svg class="ico" aria-hidden="true">
+                <use href="#i-tag" /></svg></span
+            ><span
+              ><span class="card-title">Plans and categories</span
+              ><span class="card-text">Browse categories and find the right pack.</span></span
+            ></a
+          >
+
+          <a class="card" href="#sdk"
+            ><span class="icon-tile"
+              ><svg class="ico" aria-hidden="true">
+                <use href="#i-credit-card" /></svg></span
+            ><span
+              ><span class="card-title">TypeScript SDK</span
+              ><span class="card-text">Use Ncell from your own Node.js application.</span></span
+            ></a
+          >
+
+          <a class="card" href="#sms"
+            ><span class="icon-tile"
+              ><svg class="ico" aria-hidden="true">
+                <use href="#i-message-square" /></svg></span
+            ><span
+              ><span class="card-title">Send Free SMS</span
+              ><span class="card-text">Send a message using your free SMS allowance.</span></span
+            ></a
+          >
+
+          <a class="card" href="#commands"
+            ><span class="icon-tile"
+              ><svg class="ico" aria-hidden="true">
+                <use href="#i-terminal" /></svg></span
+            ><span
+              ><span class="card-title">Command reference</span
+              ><span class="card-text">Every command and option at a glance.</span></span
+            ></a
+          >
+        </nav>
+
+        <h2 id="installation">Installation</h2>
+        <p>Requires Node.js 22.12 or newer. Works on Windows, macOS and Linux.</p>
+        <h3 id="installation-cli">Install the CLI</h3>
+        <p>Install the command globally.</p>
+        <pre data-lang="Shell"><code>npm install -g ncell</code></pre>
+        <p>Show the available commands.</p>
+        <pre data-lang="Shell"><code>ncell --help</code></pre>
+        <h3 id="installation-npx">Run without installing globally</h3>
+        <pre data-lang="Shell"><code>npx ncell --help</code></pre>
+        <h3 id="installation-package">Install the package</h3>
+        <pre data-lang="Shell"><code>npm install ncell</code></pre>
+        <p>See <a href="#sdk">Use as a package</a> for TypeScript and JavaScript examples.</p>
+        <h3 id="installation-requirements">Credential storage</h3>
+        <p>
+          The CLI uses your native OS credential store. On Linux, unlock a Secret Service provider
+          such as GNOME Keyring or KWallet with Secret Service enabled. A desktop session normally
+          provides its D-Bus connection.
+        </p>
+        <p>
+          For a headless Node.js application, provide an
+          <a href="#sdk-stores">in-memory or custom session store</a>. This package currently
+          targets Node.js.
+        </p>
+
+        <!-- shared-section:login -->
+
+        <h2 id="sessions">Sessions and token refresh</h2>
+        <p>
+          Tokens and device identity are stored in your OS's native credential store. Accounts stay
+          separate from the Rust CLI.
+        </p>
+        <p>
+          The credential service keeps its original name, <code>ncell-app</code>, so existing npm
+          logins survive the package rename. Each account has its own secure entry. The CLI never
+          stores tokens in scripts or plain-text configuration files.
+        </p>
+        <h3 id="sessions-auto">Automatic refresh</h3>
+        <p>
+          The CLI refreshes tokens when Ncell reports an expired access token. A rejected refresh
+          token requires a new login. Other failures do not trigger reward-request retries.
+        </p>
+        <h3 id="sessions-manual">Manual refresh</h3>
+        <pre data-lang="Shell"><code>ncell refresh</code></pre>
+        <!-- shared-section:balance -->
+
+        <!-- shared-section:plans -->
+
+        <!-- shared-section:searching -->
+
+        <!-- shared-section:subscribe -->
+
+        <!-- shared-section:sms -->
+
+        <!-- shared-section:games -->
+
+        <!-- shared-section:scripts -->
+
+        <h2 id="sdk">Use as a package</h2>
+        <pre data-lang="TypeScript"><code>import ncell from 'ncell';
+
+// Request an OTP, then enter the code sent to your phone.
+await ncell.requestOtp('98XXXXXXXX');
+await ncell.verifyOtp('98XXXXXXXX', '123456');
+
+console.log(await ncell.balance());
+console.log(await ncell.checkIn());
+</code></pre>
+        <p>Use a named factory when you need separate instances or options:</p>
+        <pre data-lang="TypeScript"><code>import { createNcellApp, NcellError } from 'ncell';
+
+const app = createNcellApp({ timeoutMs: 90_000 });
+
+try {
+  const result = await app.spin({
+    count: 3,
+    delay: '1.5s',
+    onEvent: (event) =&gt; console.log(event),
+  });
+  console.log(result.games, result.stop);
+} catch (error) {
+  if (error instanceof NcellError) {
+    console.error(error.code, error.status, error.message);
+  } else {
+    throw error;
+  }
+}
+</code></pre>
+        <p>
+          SDK methods do not prompt or print. Provide <code>manualAnswer</code> when automatic math
+          may need help:
+        </p>
+        <pre data-lang="TypeScript"><code>await app.math({
+  count: 1,
+  manualAnswer: async (question) =&gt; {
+    return getAnswerFromYourInterface(question);
+  },
+  onEvent: (event) =&gt; {
+    if (event.event === 'answer') showAnswerInYourInterface(event.result);
+  },
+});
+</code></pre>
+        <p>
+          <code>getAnswerFromYourInterface</code> and
+          <code>showAnswerInYourInterface</code> represent your own UI functions. Without a handler,
+          unsupported math rejects with <code>MANUAL_ANSWER_REQUIRED</code> and the question in
+          <code>error.response</code>.
+        </p>
+        <h3 id="sdk-methods">Methods</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Purpose</th>
+                <th>Methods</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>OTP login</td>
+                <td>
+                  <code>requestOtp(number)</code>,
+                  <code>verifyOtp(number, otp, { activate?: boolean })</code>
+                </td>
+              </tr>
+              <tr>
+                <td>Saved accounts</td>
+                <td>
+                  <code>listAccounts()</code>, <code>switchAccount(number)</code>,
+                  <code>removeAccount(number)</code>, <code>logout()</code>
+                </td>
+              </tr>
+              <tr>
+                <td>Session</td>
+                <td><code>status()</code>, <code>refresh()</code></td>
+              </tr>
+              <tr>
+                <td>Account details</td>
+                <td><code>balance()</code>, <code>profile()</code></td>
+              </tr>
+              <tr>
+                <td>Plans</td>
+                <td>
+                  <code>categories()</code>, <code>plans({ category?, keyword?, sort? })</code>,
+                  <code>subscribe(id, category?)</code>
+                </td>
+              </tr>
+              <tr>
+                <td>SMS</td>
+                <td><code>sendFreeSms(number, text)</code></td>
+              </tr>
+              <tr>
+                <td>Game rewards</td>
+                <td>
+                  <code>checkIn()</code>, <code>taskStatus()</code>,
+                  <code>claimTasks(idsOrAll, onTask?)</code>, <code>ranks()</code>
+                </td>
+              </tr>
+              <tr>
+                <td>Games</td>
+                <td>
+                  <code>spin(options?)</code>, <code>scratch(options?)</code>,
+                  <code>math(options?)</code>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Set <code>{ activate: false }</code> when verifying an added account to preserve the
+          active account.
+        </p>
+        <h3 id="sdk-stores">In-memory and custom stores</h3>
+        <pre
+          data-lang="TypeScript"
+        ><code>import { createNcellApp, MemorySessionStore } from 'ncell';
+
+const app = createNcellApp({ store: new MemorySessionStore() });
+</code></pre>
+        <p>
+          An in-memory store lasts only as long as the process. Log in through
+          <code>requestOtp</code> and <code>verifyOtp</code>, or initialize the store with a typed
+          <code>Session</code> obtained through your own secure storage.
+        </p>
+        <p>
+          You can implement the exported <code>SessionStore</code> interface with
+          <code>load()</code>, <code>save(session)</code> and <code>clear()</code>. Optional
+          <code>withLock(operation)</code> lets a store protect transactions across instances or
+          processes.
+        </p>
+
+        <h3 id="sdk-cli">Embed the CLI or script tools</h3>
+        <pre data-lang="TypeScript"><code>import { runCli } from 'ncell/cli';
+import { createNcellApp, MemorySessionStore } from 'ncell';
+
+await runCli(['game', 'status'], {
+  app: createNcellApp({ store: new MemorySessionStore() }),
+});
+</code></pre>
+        <!-- shared-section:commands -->
+      </article>
+
+      <footer class="page-footer">
+        <p>ncell v{{version}} <span class="footer-dot">·</span> MIT licensed</p>
+
+        <a href="https://github.com/rohityadav-sas/ncell-app"
+          ><svg class="ico ico-fill" aria-hidden="true">
+            <use href="#i-github" /></svg
+          ><span>View source on GitHub</span></a
+        >
+      </footer>
+    </main>
+
+    <dialog id="search-dialog" aria-label="Search documentation">
+      <div class="search-head">
+        <svg class="ico" aria-hidden="true">
+          <use href="#i-search" />
+        </svg>
+
+        <input
+          id="search-input"
+          type="search"
+          placeholder="Search documentation"
+          autocomplete="off"
+          spellcheck="false"
+          role="combobox"
+          aria-label="Search documentation"
+          aria-expanded="false"
+          aria-controls="search-results"
+          aria-autocomplete="list"
+        />
+
+        <kbd>Esc</kbd>
+      </div>
+
+      <p id="search-status" class="search-hint" role="status"></p>
+
+      <ul id="search-results" role="listbox" aria-label="Search results"></ul>
+
+      <div class="search-foot">
+        <span
+          ><kbd
+            ><svg class="ico" aria-hidden="true">
+              <use href="#i-arrow-up" /></svg></kbd
+          ><kbd
+            ><svg class="ico" aria-hidden="true">
+              <use href="#i-arrow-down" /></svg
+          ></kbd>
+
+          to navigate</span
+        >
+
+        <span
+          ><kbd
+            ><svg class="ico" aria-hidden="true">
+              <use href="#i-corner-down-left" /></svg
+          ></kbd>
+
+          to open</span
+        >
+
+        <span><kbd>Esc</kbd> to close</span>
+      </div>
+    </dialog>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>

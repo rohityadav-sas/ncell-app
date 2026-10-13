@@ -2,8 +2,10 @@ name: Deploy documentation
 on:
   push:
     branches: [main]
-    paths: ['docs/**', '.github/workflows/pages.yml']
+    paths: ['docs/**', 'docs-source/**', 'scripts/**', 'package*.json', '.github/workflows/pages.yml']
   workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
 permissions:
   contents: read
   pages: write
@@ -19,6 +21,16 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: rohityadav-sas/ncell-cli
+          path: .local/docs-source
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run docs:sync -- --source .local/docs-source
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

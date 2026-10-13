@@ -1,5 +1,8 @@
 import { Command, InvalidArgumentError } from 'commander';
+import { createRequire } from 'node:module';
 import { parseCount, parseDelay } from '../app.js';
+
+const { version } = createRequire(import.meta.url)('../../package.json') as { version: string };
 
 export interface ParsedCommand {
   command: string;
@@ -35,7 +38,7 @@ export function createProgram(
 ): Command {
   const program = new Command('ncell')
     .description('Ncell account CLI')
-    .version('0.1.0')
+    .version(version)
     .option('--json', 'Print structured JSON output')
     .exitOverride()
     .showHelpAfterError();

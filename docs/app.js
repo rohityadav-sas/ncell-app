@@ -8,7 +8,9 @@
   const scrim = $('#scrim');
   const menuBtn = $('#menu-btn');
   const navLinks = [...sidebar.querySelectorAll('a')];
-  const THEME_KEY = 'ncell-package-docs-theme';
+  const DOCS_NAME = root.dataset.docsName || 'ncell-cli';
+  const STORAGE_PREFIX = root.dataset.docsStorage || 'ncell-docs';
+  const THEME_KEY = STORAGE_PREFIX + '-theme';
   const SVG_NS = 'http://www.w3.org/2000/svg';
 
   function icon(name, extraClass = '') {
@@ -51,7 +53,7 @@
   syncThemeButton();
 
   /* ---------- Shared sidebar scroll position ---------- */
-  const SIDEBAR_SCROLL_KEY = 'ncell-package-docs-sidebar-scroll';
+  const SIDEBAR_SCROLL_KEY = STORAGE_PREFIX + '-sidebar-scroll';
   function saveSidebarScroll() {
     if (!sidebar.getClientRects().length) return;
     try {
@@ -440,7 +442,7 @@
       }
     }
     if (version !== routeVersion) return;
-    document.title = codesMode ? 'Response codes · ncell' : 'ncell documentation';
+    document.title = codesMode ? 'Response codes · ' + DOCS_NAME : DOCS_NAME + ' documentation';
     // Scroll within a view; fade between views after positioning the destination.
     const destination = document.getElementById(id);
     navigationTarget =
