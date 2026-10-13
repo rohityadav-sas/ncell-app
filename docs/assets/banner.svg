@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360"
-  aria-label="ncell. Your Ncell account, in your terminal and code. v0.1.0. TypeScript SDK. MIT licensed.">
+  aria-label="ncell. Your Ncell account, in your terminal and code. v0.2.0. TypeScript SDK. MIT licensed.">
   <defs>
     <radialGradient id="b">
       <stop stop-color="#a855f7" stop-opacity=".4" />
@@ -26,7 +26,7 @@
     text-anchor="middle" fill="#f3e8ff">
     <rect width="90" height="38" rx="19" fill="#fff" fill-opacity=".09" stroke="#d8b4fe"
       stroke-opacity=".3" />
-    <text x="45" y="25">v0.1.0</text>
+    <text x="45" y="25">v0.2.0</text>
     <rect x="102" width="170" height="38" rx="19" fill="#fff" fill-opacity=".09" stroke="#d8b4fe"
       stroke-opacity=".3" />
     <text x="187" y="25">TypeScript SDK</text>
