@@ -1,23 +1,6 @@
 (() => {
   'use strict';
 
-  fetch('version.json')
-    .then((response) => {
-      if (!response.ok) throw new Error('Version metadata unavailable');
-      return response.json();
-    })
-    .then(({ version }) => {
-      if (
-        typeof version !== 'string' ||
-        !/^\d+\.\d+\.\d+(?:-[\w.-]+)?(?:\+[\w.-]+)?$/.test(version)
-      )
-        return;
-      document.querySelectorAll('[data-package-version]').forEach((element) => {
-        element.textContent = 'v' + version;
-      });
-    })
-    .catch(() => {});
-
   const $ = (selector, scope = document) => scope.querySelector(selector);
   const root = document.documentElement;
   const article = $('#content');
