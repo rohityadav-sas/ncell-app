@@ -347,8 +347,12 @@ test('catalog categories are cached per account, copied, expire and select SMS a
   assert.ok(server.calls[1]?.url.endsWith('/product/sms-plans'));
   assert.ok(server.calls[2]?.url.endsWith('/product/voice-plans'));
   assert.equal(server.calls[1]?.body.keyword, 'SMS');
-  assert.equal(Object.keys(server.calls[1]?.body ?? {}).length, 5);
-  assert.equal(Object.keys(server.calls[2]?.body ?? {}).length, 4);
+  for (const call of server.calls.slice(1, 3)) {
+    assert.deepEqual(call?.body.sortby, { name: 'price', isDescending: false });
+    assert.equal(call?.body.pageableDto, undefined);
+  }
+  assert.equal(Object.keys(server.calls[1]?.body ?? {}).length, 6);
+  assert.equal(Object.keys(server.calls[2]?.body ?? {}).length, 5);
   await assert.rejects(client.plans({ category: 999 }), /Unknown category/);
   await client.switchAccount('9823456789');
   await client.categories();

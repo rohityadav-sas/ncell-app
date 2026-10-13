@@ -345,6 +345,7 @@ export class AccountService {
       msisdn: account.msisdn,
       languageCode: '1',
       tagId: category,
+      sortby: { name: 'price', isDescending: false },
       requestHeader: requestHeader(account.msisdn, 'SHOP'),
     };
     if (keyword !== '') body.keyword = keyword;
