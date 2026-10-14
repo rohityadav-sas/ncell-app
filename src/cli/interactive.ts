@@ -302,7 +302,7 @@ export async function runInteractive(session: InteractiveSession): Promise<void>
     process.stdout.removeListener('resize', resize);
     process.removeListener('SIGINT', sigint);
     await keyboard.stop();
-    erase();
+    clearViewport();
     session.out('\x1b[0m\n');
   }
 }
