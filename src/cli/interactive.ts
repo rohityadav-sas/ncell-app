@@ -154,14 +154,14 @@ export async function runInteractive(session: InteractiveSession): Promise<void>
     cursorTo(process.stdout, 0);
     clearScreenDown(process.stdout);
   };
-  // Blank every visible row with spaces, then park at the top-left. Uses only
-  // cursor moves and spaces so it works even where erase sequences are ignored.
-  // Scrollback above the viewport is preserved.
-  const clearViewport = (): void => {
-    const columns = Math.max(9, process.stdout.columns || 80);
+  // Scroll everything currently on screen into the scrollback, then park at
+  // the top-left of a blank viewport. Nothing is erased, so outer shell
+  // history and this session's output both stay scrollable.
+  const scrollOff = (): void => {
+    erase();
     const height = Math.max(1, process.stdout.rows || 24);
     let frame = '';
-    for (let row = 1; row <= height; row++) frame += '\x1b' + `[${row};1H` + ' '.repeat(columns);
+    for (let row = 0; row < height; row++) frame += '\n';
     frame += '\x1b' + '[1;1H';
     session.out(frame);
   };
@@ -249,7 +249,7 @@ export async function runInteractive(session: InteractiveSession): Promise<void>
         }
         if (effect.kind === 'clear') {
           trace('branch-clear', '');
-          clearViewport();
+          scrollOff();
           session.out(theme.welcome(Math.max(9, process.stdout.columns || 80)));
           editor.reset();
         }
@@ -285,10 +285,8 @@ export async function runInteractive(session: InteractiveSession): Promise<void>
   session.completion.onChange = resize;
   try {
     // Remember where the session started so exit can erase exactly the
-    // session region without touching the outer shell above it.
-    session.out('\x1b' + '[s');
     // Fresh viewport on entry so the first frame matches a cleared screen.
-    clearViewport();
+    scrollOff();
     session.out(theme.welcome(Math.max(9, process.stdout.columns || 80)));
     await new Promise<void>((resolve) => {
       finish = resolve;
@@ -305,8 +303,7 @@ export async function runInteractive(session: InteractiveSession): Promise<void>
     process.stdout.removeListener('resize', resize);
     process.removeListener('SIGINT', sigint);
     await keyboard.stop();
-    session.out('\x1b' + '[u');
-    erase();
+    scrollOff();
     session.out('\x1b[0m\n');
   }
 }
