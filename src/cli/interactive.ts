@@ -284,6 +284,9 @@ export async function runInteractive(session: InteractiveSession): Promise<void>
   };
   session.completion.onChange = resize;
   try {
+    // Remember where the session started so exit can erase exactly the
+    // session region without touching the outer shell above it.
+    session.out('\x1b' + '[s');
     // Fresh viewport on entry so the first frame matches a cleared screen.
     clearViewport();
     session.out(theme.welcome(Math.max(9, process.stdout.columns || 80)));
@@ -302,7 +305,8 @@ export async function runInteractive(session: InteractiveSession): Promise<void>
     process.stdout.removeListener('resize', resize);
     process.removeListener('SIGINT', sigint);
     await keyboard.stop();
-    clearViewport();
+    session.out('\x1b' + '[u');
+    erase();
     session.out('\x1b[0m\n');
   }
 }
