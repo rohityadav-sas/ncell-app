@@ -185,10 +185,14 @@ test('clear empties the screen without executing, alongside exit', async () => {
   const root = await completion.suggest('', undefined, true);
   assert.ok(names(root).includes('exit'));
   assert.ok(names(root).includes('clear'));
+  assert.ok(!names(root).includes('cls'));
   const editor = new InteractiveEditor();
   editor.input = 'clear';
   editor.cursor = editor.input.length;
   assert.equal(editor.key({ name: 'return' }, await completion.suggest('clear')).kind, 'clear');
+  editor.input = 'cls';
+  editor.cursor = editor.input.length;
+  assert.equal(editor.key({ name: 'return' }, await completion.suggest('cls')).kind, 'clear');
   const exiting = new InteractiveEditor();
   exiting.input = 'exit';
   exiting.cursor = exiting.input.length;

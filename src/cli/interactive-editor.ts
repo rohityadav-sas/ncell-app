@@ -90,7 +90,7 @@ export class InteractiveEditor {
       trace('key-exit', this.input);
       return { kind: 'exit' };
     }
-    if (key.name === 'return' && this.input.trim() === 'clear') {
+    if (key.name === 'return' && ['clear', 'cls'].includes(this.input.trim())) {
       trace('key-clear', this.input);
       return { kind: 'clear' };
     }
