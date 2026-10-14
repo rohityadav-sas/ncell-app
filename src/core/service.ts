@@ -263,7 +263,16 @@ export class AccountService {
 
   async logout(): Promise<{ loggedOut: true }> {
     return this.transaction(async () => {
-      const session = await this.store.load();
+      let session: Session | undefined;
+      try {
+        session = await this.store.load();
+      } catch (error) {
+        if (error instanceof NcellError && error.code === 'INVALID_SESSION') {
+          await this.store.clear();
+          return { loggedOut: true };
+        }
+        throw error;
+      }
       if (session !== undefined) {
         logout(session);
         await this.saveRemaining(session);

@@ -198,6 +198,24 @@ test('account add from empty saves without selecting, then switch activates it',
   assert.equal((await client.status()).account, '9812345678');
 });
 
+test('logout clears a corrupt session instead of failing on it', async () => {
+  const backing = new MemorySessionStore();
+  let cleared = false;
+  const corrupt = {
+    load: async (): Promise<Session | undefined> => {
+      throw new NcellError('Saved session is invalid', { code: 'INVALID_SESSION' });
+    },
+    save: (session: Session) => backing.save(session),
+    clear: async () => {
+      cleared = true;
+      await backing.clear();
+    },
+  };
+  const client = new AccountService({ store: corrupt });
+  assert.deepEqual(await client.logout(), { loggedOut: true });
+  assert.equal(cleared, true);
+});
+
 test('refresh rotates only active tokens, preserves device and missing refresh token, and records expiry', async () => {
   const server = mockFetch([
     ok({
