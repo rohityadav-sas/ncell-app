@@ -3,7 +3,7 @@ import type { ChildProcess } from 'node:child_process';
 import { createInterface, cursorTo, clearScreenDown, emitKeypressEvents } from 'node:readline';
 import type { Key } from 'node:readline';
 import type { Completion, CompletionEngine } from './completion.js';
-import { InteractiveEditor } from './interactive-editor.js';
+import { InteractiveEditor, trace } from './interactive-editor.js';
 import type { EditorKey } from './interactive-editor.js';
 import { InteractiveTheme, cellWidth, fit } from './interactive-view.js';
 
@@ -154,6 +154,17 @@ export async function runInteractive(session: InteractiveSession): Promise<void>
     cursorTo(process.stdout, 0);
     clearScreenDown(process.stdout);
   };
+  // Blank every visible row with spaces, then park at the top-left. Uses only
+  // cursor moves and spaces so it works even where erase sequences are ignored.
+  // Scrollback above the viewport is preserved.
+  const clearViewport = (): void => {
+    const columns = Math.max(9, process.stdout.columns || 80);
+    const height = Math.max(1, process.stdout.rows || 24);
+    let frame = '';
+    for (let row = 1; row <= height; row++) frame += '\x1b' + `[${row};1H` + ' '.repeat(columns);
+    frame += '\x1b' + '[1;1H';
+    session.out(frame);
+  };
   const render = async (): Promise<void> => {
     if (closed || busy) return;
     const revision = ++renderId;
@@ -237,7 +248,8 @@ export async function runInteractive(session: InteractiveSession): Promise<void>
           return;
         }
         if (effect.kind === 'clear') {
-          session.out('\x1b' + '[2J' + '\x1b' + '[1;1H');
+          trace('branch-clear', '');
+          clearViewport();
           session.out(theme.welcome(Math.max(9, process.stdout.columns || 80)));
           editor.reset();
         }
@@ -272,9 +284,8 @@ export async function runInteractive(session: InteractiveSession): Promise<void>
   };
   session.completion.onChange = resize;
   try {
-    // Fresh viewport on entry so the first frame matches a cleared screen:
-    // ANSI clear keeps the outer shell in the scrollback instead of erasing it.
-    session.out('\x1b' + '[2J' + '\x1b' + '[1;1H');
+    // Fresh viewport on entry so the first frame matches a cleared screen.
+    clearViewport();
     session.out(theme.welcome(Math.max(9, process.stdout.columns || 80)));
     await new Promise<void>((resolve) => {
       finish = resolve;

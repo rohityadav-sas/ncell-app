@@ -1,5 +1,18 @@
 import { acceptSuggestion } from './completion.js';
 import type { Completion } from './completion.js';
+import { appendFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+/** Env-gated trace (NCELL_TRACE=1) for diagnosing interactive dispatch. */
+export function trace(marker: string, input: string): void {
+  if (!process.env.NCELL_TRACE) return;
+  try {
+    appendFileSync(join(tmpdir(), 'ncell-trace.log'), `${marker} input=${JSON.stringify(input)}\n`);
+  } catch {
+    /* Tracing must never break the editor. */
+  }
+}
 
 export interface EditorKey {
   name?: string | undefined;
@@ -73,6 +86,14 @@ export class InteractiveEditor {
       return { kind: 'render' };
     }
     const suggestion = matches[Math.min(this.selected, Math.max(0, matches.length - 1))];
+    if (key.name === 'return' && this.input.trim() === 'exit') {
+      trace('key-exit', this.input);
+      return { kind: 'exit' };
+    }
+    if (key.name === 'return' && this.input.trim() === 'clear') {
+      trace('key-clear', this.input);
+      return { kind: 'clear' };
+    }
     if ((key.name === 'tab' || key.name === 'return') && suggestion) {
       const exact = this.input.slice(completion.start, completion.end) === suggestion.value;
       if (
@@ -89,8 +110,6 @@ export class InteractiveEditor {
       }
     }
     if (key.name === 'return') {
-      if (this.input.trim() === 'exit') return { kind: 'exit' };
-      if (this.input.trim() === 'clear') return { kind: 'clear' };
       return this.input.trim()
         ? { kind: 'submit', command: this.input.trim() }
         : { kind: 'render' };
