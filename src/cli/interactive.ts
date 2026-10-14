@@ -240,6 +240,7 @@ export async function runInteractive(session: InteractiveSession): Promise<void>
           erase();
           session.out('\x1b' + '[2J');
           cursorTo(process.stdout, 0, 0);
+          session.out(theme.welcome(Math.max(9, process.stdout.columns || 80)));
           editor.reset();
         }
         if (effect.kind === 'submit') {
@@ -273,6 +274,10 @@ export async function runInteractive(session: InteractiveSession): Promise<void>
   };
   session.completion.onChange = resize;
   try {
+    // The whole session lives in the alternate screen: the outer shell's
+    // scrollback is never touched, and `clear` can wipe everything below.
+    // The finally block below always restores the outer screen on exit.
+    session.out('\x1b' + '[?1049h');
     session.out(theme.welcome(Math.max(9, process.stdout.columns || 80)));
     await new Promise<void>((resolve) => {
       finish = resolve;
@@ -289,6 +294,7 @@ export async function runInteractive(session: InteractiveSession): Promise<void>
     process.stdout.removeListener('resize', resize);
     process.removeListener('SIGINT', sigint);
     await keyboard.stop();
+    session.out('\x1b' + '[?1049l');
     erase();
     session.out('\x1b[0m\n');
   }

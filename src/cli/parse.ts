@@ -94,6 +94,7 @@ export function createProgram(
     .action(action('account remove'));
   program.command('status').description('Show session status').action(action('status'));
   program.command('logout').description('Remove the active account').action(action('logout'));
+  program.command('docs').description('Open documentation').action(action('docs'));
   program.command('refresh').description('Rotate tokens').action(action('refresh'));
   program
     .command('balance')

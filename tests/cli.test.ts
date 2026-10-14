@@ -8,6 +8,7 @@ import { NcellApp } from '../src/app.js';
 import { MemorySessionStore, NcellError } from '../src/core/index.js';
 import { ScriptExecutionError, ScriptLibrary } from '../src/scripts.js';
 import { parseCommand } from '../src/cli/parse.js';
+import { openDocs } from '../src/cli/open.js';
 import { errorOutput, runCli } from '../src/cli/program.js';
 
 const primary = '9800000000';
@@ -224,6 +225,7 @@ test('parse every CLI command family with global JSON and standard defaults', ()
       `script ${action}`,
     ]),
     [['script', 'list'], 'script list'],
+    [['docs'], 'docs'],
   ];
   for (const [argv, command] of cases) {
     assert.equal(parse(argv).command, command);
@@ -239,6 +241,15 @@ test('parse every CLI command family with global JSON and standard defaults', ()
   assert.equal(parse(['plans', 'search', 'SMS', '--sort', 'validity:desc']).sort, 'validity:desc');
   assert.equal(parse(['game', 'scratch', '--count', 'all', '--delay', '1.5h']).delay, 5400);
   assert.equal(parse(['game', 'math', '--delay', '.5s']).delay, 0.5);
+});
+
+test('docs opens the packaged documentation without a browser side effect in tests', async () => {
+  let opened = '';
+  const file = await openDocs(async (target) => {
+    opened = target;
+  });
+  assert.match(file, /docs.index\.html$/);
+  assert.match(opened, /^file:.*docs.index\.html$/);
 });
 
 test('invalid commands, counts, delays, destinations and task IDs fail before execution', () => {

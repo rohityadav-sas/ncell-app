@@ -15,6 +15,7 @@ import { Formatter } from './format.js';
 import { parseCommand } from './parse.js';
 import type { ParsedCommand } from './parse.js';
 import { CompletionEngine } from './completion.js';
+import { openDocs } from './open.js';
 import { runInteractive } from './interactive.js';
 import type { InteractiveSession } from './interactive.js';
 
@@ -108,6 +109,13 @@ async function execute(command: ParsedCommand, context: Context): Promise<void> 
     case 'logout': {
       const response = await app.logout();
       result(context, command, response, () => format.message('Active account removed locally.'));
+      return;
+    }
+    case 'docs': {
+      const file = await openDocs();
+      result(context, command, { opened: file }, () =>
+        format.message(`Opened documentation at ${file}.`),
+      );
       return;
     }
     case 'account switch': {

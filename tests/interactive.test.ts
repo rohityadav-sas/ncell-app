@@ -275,7 +275,7 @@ test('Ctrl+Space variants work without treating arrow NULs as suggestions shortc
   assert.equal(editor.explicit, false);
 });
 
-test('Escape only dismisses suggestions; Ctrl+A, word deletion, Unicode and history keep editing predictable', async () => {
+test('Escape only dismisses suggestions; Ctrl+A, word deletion and Unicode keep editing predictable', async () => {
   const completion = engine();
   const editor = new InteractiveEditor();
   editor.input = 'sms send-free ';
@@ -291,7 +291,7 @@ test('Escape only dismisses suggestions; Ctrl+A, word deletion, Unicode and hist
   assert.equal(editor.input, 'game spin --count ');
   editor.reset();
   editor.key({ name: 'up' }, await completion.suggest(''));
-  assert.equal(editor.input, 'game spin --count ');
+  assert.equal(editor.input, '');
   editor.key({ name: 'down' }, await completion.suggest(editor.input));
   assert.equal(editor.input, '');
   editor.input = 'नमस्ते 👋';

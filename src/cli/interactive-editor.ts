@@ -17,19 +17,14 @@ export class InteractiveEditor {
   explicit = false;
   dismissed = false;
   allSelected = false;
-  history: string[] = [];
-  #historyIndex = -1;
-  #draft = '';
 
   reset(): void {
-    if (this.input.trim() && this.history.at(-1) !== this.input) this.history.push(this.input);
     this.input = '';
     this.cursor = 0;
     this.selected = 0;
     this.explicit = false;
     this.dismissed = false;
     this.allSelected = false;
-    this.#historyIndex = -1;
   }
 
   key(key: EditorKey, completion: Completion): EditorEffect {
@@ -75,19 +70,6 @@ export class InteractiveEditor {
       if (matches.length)
         this.selected =
           (this.selected + (key.name === 'up' ? -1 : 1) + matches.length) % matches.length;
-      else if (this.history.length) {
-        if (this.#historyIndex < 0) this.#draft = this.input;
-        this.#historyIndex = Math.max(
-          -1,
-          Math.min(this.history.length - 1, this.#historyIndex + (key.name === 'up' ? 1 : -1)),
-        );
-        this.input =
-          this.#historyIndex < 0
-            ? this.#draft
-            : this.history[this.history.length - 1 - this.#historyIndex]!;
-        this.cursor = this.input.length;
-        this.dismissed = true;
-      }
       return { kind: 'render' };
     }
     const suggestion = matches[Math.min(this.selected, Math.max(0, matches.length - 1))];
