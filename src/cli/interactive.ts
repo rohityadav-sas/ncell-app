@@ -236,6 +236,12 @@ export async function runInteractive(session: InteractiveSession): Promise<void>
           close();
           return;
         }
+        if (effect.kind === 'clear') {
+          erase();
+          session.out('\x1b' + '[2J');
+          cursorTo(process.stdout, 0, 0);
+          editor.reset();
+        }
         if (effect.kind === 'submit') {
           busy = true;
           keyboardGeneration++;

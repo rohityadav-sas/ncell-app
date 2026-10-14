@@ -429,11 +429,18 @@ export class CompletionEngine {
             }))
         : [];
     if (command === this.program && !prefix.startsWith('-'))
-      commands.push({
-        value: 'exit',
-        description: 'Exit the interactive shell',
-        kind: 'command',
-      });
+      commands.push(
+        {
+          value: 'exit',
+          description: 'Exit the interactive shell',
+          kind: 'command',
+        },
+        {
+          value: 'clear',
+          description: 'Clear the screen',
+          kind: 'command',
+        },
+      );
     const supplied = positional + Number(!!argument && completeArgument(argument, active));
     const missingRequired = command.registeredArguments.some(
       (item, index) => item.required && index >= supplied,

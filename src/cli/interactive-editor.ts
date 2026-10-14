@@ -8,7 +8,7 @@ export interface EditorKey {
   text?: string;
 }
 export type EditorEffect =
-  { kind: 'render' } | { kind: 'exit' } | { kind: 'submit'; command: string };
+  { kind: 'render' } | { kind: 'exit' } | { kind: 'clear' } | { kind: 'submit'; command: string };
 
 export class InteractiveEditor {
   input = '';
@@ -108,6 +108,7 @@ export class InteractiveEditor {
     }
     if (key.name === 'return') {
       if (this.input.trim() === 'exit') return { kind: 'exit' };
+      if (this.input.trim() === 'clear') return { kind: 'clear' };
       return this.input.trim()
         ? { kind: 'submit', command: this.input.trim() }
         : { kind: 'render' };

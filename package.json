@@ -1,6 +1,6 @@
 {
   "name": "ncell",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Ncell account SDK and command-line interface",
   "author": "Rohit Yadav",
   "keywords": [

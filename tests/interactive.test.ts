@@ -180,6 +180,21 @@ test('sort completions include only directions, preserve commas and omit repeate
   assert.equal(editor.key({ name: 'return' }, options).kind, 'submit');
 });
 
+test('clear empties the screen without executing, alongside exit', async () => {
+  const completion = engine();
+  const root = await completion.suggest('', undefined, true);
+  assert.ok(names(root).includes('exit'));
+  assert.ok(names(root).includes('clear'));
+  const editor = new InteractiveEditor();
+  editor.input = 'clear';
+  editor.cursor = editor.input.length;
+  assert.equal(editor.key({ name: 'return' }, await completion.suggest('clear')).kind, 'clear');
+  const exiting = new InteractiveEditor();
+  exiting.input = 'exit';
+  exiting.cursor = exiting.input.length;
+  assert.equal(exiting.key({ name: 'return' }, await completion.suggest('exit')).kind, 'exit');
+});
+
 test('file completions follow each command storage rules and quote paths', async (context) => {
   const root = await mkdtemp(join(tmpdir(), 'ncell-completions-'));
   context.after(() => rm(root, { recursive: true, force: true }));

@@ -92,7 +92,7 @@ export function createProgram(
     .description('Remove a saved account locally')
     .argument('<number>', 'Ncell number')
     .action(action('account remove'));
-  program.command('status').description('Show local session status').action(action('status'));
+  program.command('status').description('Show session status').action(action('status'));
   program.command('logout').description('Remove the active account').action(action('logout'));
   program.command('refresh').description('Rotate tokens').action(action('refresh'));
   program
