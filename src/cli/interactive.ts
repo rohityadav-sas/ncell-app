@@ -237,9 +237,7 @@ export async function runInteractive(session: InteractiveSession): Promise<void>
           return;
         }
         if (effect.kind === 'clear') {
-          erase();
-          session.out('\x1b' + '[2J');
-          cursorTo(process.stdout, 0, 0);
+          session.out('\x1b' + '[2J' + '\x1b' + '[1;1H');
           session.out(theme.welcome(Math.max(9, process.stdout.columns || 80)));
           editor.reset();
         }
@@ -274,10 +272,9 @@ export async function runInteractive(session: InteractiveSession): Promise<void>
   };
   session.completion.onChange = resize;
   try {
-    // The whole session lives in the alternate screen: the outer shell's
-    // scrollback is never touched, and `clear` can wipe everything below.
-    // The finally block below always restores the outer screen on exit.
-    session.out('\x1b' + '[?1049h');
+    // Fresh viewport on entry so the first frame matches a cleared screen:
+    // ANSI clear keeps the outer shell in the scrollback instead of erasing it.
+    session.out('\x1b' + '[2J' + '\x1b' + '[1;1H');
     session.out(theme.welcome(Math.max(9, process.stdout.columns || 80)));
     await new Promise<void>((resolve) => {
       finish = resolve;
@@ -294,7 +291,6 @@ export async function runInteractive(session: InteractiveSession): Promise<void>
     process.stdout.removeListener('resize', resize);
     process.removeListener('SIGINT', sigint);
     await keyboard.stop();
-    session.out('\x1b' + '[?1049l');
     erase();
     session.out('\x1b[0m\n');
   }
