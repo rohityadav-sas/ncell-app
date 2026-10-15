@@ -15,6 +15,8 @@ export interface ParsedCommand {
   delay?: number;
   category?: number;
   sort?: string;
+  yes?: boolean;
+  dryRun?: boolean;
 }
 
 function positive(value: string): number {
@@ -130,6 +132,8 @@ export function createProgram(
     .description('Subscribe to a plan')
     .argument('<id>', 'Plan ID from the plans list')
     .option('--category <id>', '', positive, DEFAULT_PLAN_CATEGORY)
+    .option('--yes', 'Skip the confirmation prompt (required for scripts and pipes)')
+    .option('--dry-run', 'Show what would be bought without spending anything')
     .action(action('plans subscribe'));
   const game = program.command('game').description('Game status, rewards and leaderboard');
   for (const kind of ['spin', 'scratch', 'math']) {

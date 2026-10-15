@@ -50,12 +50,12 @@ Use a 10-digit Nepal mobile number or prefix it with `+977`. OTP input remains v
 
 ## Plans
 
-| Command                        | Arguments and options                                |
-| ------------------------------ | ---------------------------------------------------- |
-| `ncell plans`                  | `[--category <id>] [--sort <fields>]`                |
-| `ncell plans categories`       | List available catalog categories.                   |
-| `ncell plans search <keyword>` | `[--category <id>] [--sort <fields>]`                |
-| `ncell plans subscribe <id>`   | `[--category <id>]`; paid packs charge your account. |
+| Command                        | Arguments and options                                                                                     |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `ncell plans`                  | `[--category <id>] [--sort <fields>]`                                                                     |
+| `ncell plans categories`       | List available catalog categories.                                                                        |
+| `ncell plans search <keyword>` | `[--category <id>] [--sort <fields>]`                                                                     |
+| `ncell plans subscribe <id>`   | `[--category <id>] [--yes] [--dry-run]`; buying asks for confirmation, so scripts and pipes need `--yes`. |
 
 The default category is `66`. The default sort is ascending price. Sort fields are `price` and `validity`; append `:asc` or `:desc` and separate multiple fields with commas:
 

@@ -36,6 +36,12 @@ const number = (value: unknown): string => {
   const result = numeric(value);
   return result === undefined ? '-' : result.toLocaleString('en-US');
 };
+
+/** Human price for a plan pack, shared by the list and the buy prompt. */
+export function planPrice(offering: unknown): string {
+  const price = record(offering);
+  return price.priceUom === 'FREE' ? 'Free' : `Rs. ${text(price.price).replace(/\.00$/, '')}`;
+}
 const width = (value: string): number => [...value].length;
 const pad = (value: string, size: number, align: Alignment = 'left'): string => {
   const space = ' '.repeat(Math.max(0, size - width(value)));
@@ -302,12 +308,11 @@ export class Formatter {
         { title: 'Validity', width: 10, align: 'right' },
       ],
       plans.map((plan) => {
-        const price = record(plan.productOfferingPrice);
         const tech = record(plan.techInfo);
         return [
           text(plan.id),
           text(record(plan.displayInfo).displayName).trim(),
-          price.priceUom === 'FREE' ? 'Free' : `Rs. ${text(price.price).replace(/\.00$/, '')}`,
+          planPrice(plan.productOfferingPrice),
           `${text(tech.validity)} ${text(tech.validityUom)}`,
         ];
       }),

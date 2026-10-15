@@ -11,7 +11,7 @@ import {
   tokenize,
 } from '../scripts.js';
 import { CommanderError } from 'commander';
-import { Formatter } from './format.js';
+import { Formatter, planPrice } from './format.js';
 import { parseCommand } from './parse.js';
 import type { ParsedCommand } from './parse.js';
 import { CompletionEngine } from './completion.js';
@@ -64,6 +64,27 @@ function object(value: unknown): Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
     ? (value as Record<string, unknown>)
     : {};
+}
+
+/**
+ * Spending money needs an explicit yes: a flag for scripts, or a typed
+ * confirmation when a person is at the keyboard. Piped input can never
+ * confirm. `stdinTTY` defaults to the real stdin check and exists so tests
+ * can simulate a terminal.
+ */
+export async function confirmSubscribe(
+  io: Pick<CliIO, 'prompt'>,
+  name: string,
+  price: string,
+  yes: boolean,
+  stdinTTY: boolean | undefined = process.stdin.isTTY,
+): Promise<void> {
+  if (yes) return;
+  if (stdinTTY !== true)
+    throw new Error('Refusing to subscribe without --yes in non-interactive mode');
+  const answer = await io.prompt(`Subscribe to ${name} for ${price}? [y/N] `);
+  if (!['y', 'yes'].includes(answer.trim().toLowerCase()))
+    throw new Error('Subscription cancelled');
 }
 
 async function execute(command: ParsedCommand, context: Context): Promise<void> {
@@ -173,8 +194,29 @@ async function execute(command: ParsedCommand, context: Context): Promise<void> 
       return;
     }
     case 'plans subscribe': {
-      const response = await app.subscribe(number, command.category ?? DEFAULT_PLAN_CATEGORY);
-      result(context, command, response, () => format.message('Plan subscribed successfully.'));
+      const category = command.category ?? DEFAULT_PLAN_CATEGORY;
+      // Look up the plan first so the prompt can show its real name and
+      // price. The lookup is served from the plan cache when the completion
+      // dropdown already fetched this page.
+      const catalog = await app.plans({ category });
+      const found = Array.isArray(catalog.availablePackages)
+        ? catalog.availablePackages.map(object).find((item) => String(item.id) === number)
+        : undefined;
+      if (found === undefined)
+        throw new NcellError(
+          'Plan not found in this category. Use ncell plans to list available plans',
+        );
+      const name = String(object(found.displayInfo).displayName ?? '').trim();
+      const price = planPrice(found.productOfferingPrice);
+      if (command.dryRun === true) {
+        result(context, command, { dry_run: true, id: number, name, price }, () =>
+          format.message(`Would subscribe to ${name} for ${price}.`),
+        );
+        return;
+      }
+      await confirmSubscribe(context.io, name, price, command.yes === true);
+      const response = await app.subscribe(number, category);
+      result(context, command, response, () => format.message(`Subscribed to ${name}.`));
       return;
     }
     case 'game status': {

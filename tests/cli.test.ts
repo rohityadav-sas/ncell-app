@@ -9,7 +9,7 @@ import { MemorySessionStore, NcellError } from '../src/core/index.js';
 import { ScriptExecutionError, ScriptLibrary } from '../src/scripts.js';
 import { parseCommand } from '../src/cli/parse.js';
 import { openDocs } from '../src/cli/open.js';
-import { errorOutput, runCli } from '../src/cli/program.js';
+import { confirmSubscribe, errorOutput, runCli } from '../src/cli/program.js';
 
 const primary = '9800000000';
 const secondary = '9800000001';
@@ -235,6 +235,9 @@ test('parse every CLI command family with global JSON and standard defaults', ()
   assert.deepEqual(parse(['game', 'claim-task', '1,2', '3']).args, ['1', '2', '3']);
   assert.equal(parse(['game', 'spin']).count, 1);
   assert.equal(parse(['game', 'spin']).delay, 0);
+  assert.equal(parse(['plans', 'subscribe', '1', '--yes']).yes, true);
+  assert.equal(parse(['plans', 'subscribe', '1', '--dry-run']).dryRun, true);
+  assert.equal(parse(['plans', 'subscribe', '1']).yes, undefined);
   assert.equal(parse(['plans']).category, 66);
   assert.equal(parse(['plans']).sort, 'price');
   assert.equal(parse(['plans', 'search', 'SMS', '--category', '50']).category, 50);
@@ -323,7 +326,7 @@ test('real SDK executes account, read-only, free-SMS and purchase command famili
     ['plans'],
     ['plans', 'search', 'SMS', '--category', '50'],
     ['sms', 'send-free', secondary, 'A quoted message with spaces'],
-    ['plans', 'subscribe', '1'],
+    ['plans', 'subscribe', '1', '--yes'],
     ['game', 'status'],
     ['game', 'ranks'],
     ['game', 'check-in'],
@@ -341,7 +344,7 @@ test('real SDK executes account, read-only, free-SMS and purchase command famili
     await runCli(argv, { app: h.app, io: h.io });
   assert.match(h.output(), /Balance:        Rs\. 28\.42/);
   assert.match(h.output(), /SMS sent to 9800000001\./);
-  assert.match(h.output(), /Plan subscribed successfully\./);
+  assert.match(h.output(), /Subscribed to First plan\./);
   assert.match(h.output(), /Already checked in today\./);
   assert.match(h.output(), /Task 1: Task already completed today/);
   assert.match(h.output(), /Account:       9800000001/);
@@ -368,6 +371,45 @@ test('real SDK executes account, read-only, free-SMS and purchase command famili
   );
   assert.equal(h.prompts(), 0);
   assert.equal(h.stderr(), '');
+});
+
+test('plans subscribe confirms on a terminal, refuses pipes and supports dry runs', async () => {
+  const prompt = { asked: 0, answer: 'y' };
+  const io = {
+    out: () => {},
+    err: () => {},
+    prompt: async () => {
+      prompt.asked++;
+      return prompt.answer;
+    },
+    color: false,
+    terminal: true,
+  };
+  await confirmSubscribe(io, 'First plan', 'Rs. 15', false, true);
+  assert.equal(prompt.asked, 1);
+  await confirmSubscribe(io, 'First plan', 'Rs. 15', true, true);
+  assert.equal(prompt.asked, 1);
+  await assert.rejects(confirmSubscribe(io, 'First plan', 'Rs. 15', false, false), /without --yes/);
+  prompt.answer = 'n';
+  await assert.rejects(
+    confirmSubscribe(io, 'First plan', 'Rs. 15', false, true),
+    /Subscription cancelled/,
+  );
+  const h = harness();
+  await runCli(['plans', 'subscribe', '1', '--dry-run'], { app: h.app, io: h.io });
+  assert.match(h.output(), /Would subscribe to First plan for Rs\. 15\./);
+  assert.equal(
+    h.requests.filter((request) => request.url.includes('/product/subscribe')).length,
+    0,
+  );
+  await assert.rejects(
+    runCli(['plans', 'subscribe', '1'], { app: h.app, io: h.io }),
+    /without --yes/,
+  );
+  assert.equal(
+    h.requests.filter((request) => request.url.includes('/product/subscribe')).length,
+    0,
+  );
 });
 
 test('login requests and verifies OTP while account add keeps the active account', async () => {
@@ -562,7 +604,7 @@ test('script quoted SMS and purchase commands use only injected mock requests', 
   const scripts = new ScriptLibrary(root, async () => {});
   await writeFile(
     join(root, 'quoted.ncell'),
-    'sms send-free 9800000001 "Hello; $5 | literal text"\nplans subscribe "1"\n',
+    'sms send-free 9800000001 "Hello; $5 | literal text"\nplans subscribe "1" --yes\n',
     'utf8',
   );
   const h = harness();
@@ -577,7 +619,7 @@ test('script quoted SMS and purchase commands use only injected mock requests', 
     1,
   );
   assert.match(h.output(), /^Step 1 of 2 · sms send-free/);
-  assert.match(h.output(), /\n\nStep 2 of 2 · plans subscribe "1"\n\n/);
+  assert.match(h.output(), /\n\nStep 2 of 2 · plans subscribe "1" --yes\n\n/);
 });
 
 test('CLI create, edit, list and delete share the saved script library', async (t) => {
@@ -663,7 +705,7 @@ test('account selection in scripts affects following requests and retains device
   const scripts = new ScriptLibrary(root, async () => {});
   await writeFile(
     join(root, 'switch.ncell'),
-    `balance\naccount switch ${secondary}\nbalance\naccount switch ${primary}\nplans subscribe 1\n`,
+    `balance\naccount switch ${secondary}\nbalance\naccount switch ${primary}\nplans subscribe 1 --yes\n`,
     'utf8',
   );
   const h = harness();
