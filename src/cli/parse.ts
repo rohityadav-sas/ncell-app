@@ -176,10 +176,6 @@ export function createProgram(
       .action(action(`script ${name}`));
   }
   script.command('list').description('List saved scripts').action(action('script list'));
-  program
-    .command('interactive')
-    .description('Open the interactive command editor with live suggestions')
-    .action(action('interactive'));
   // Commander scopes parent options when positional parsing is enabled.
   // Declare the global flag on descendants so it also works after any command.
   const globals = (parent: Command): void => {

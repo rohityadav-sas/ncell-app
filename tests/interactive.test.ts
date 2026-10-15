@@ -45,7 +45,7 @@ test('completion schema follows Commander metadata, including future commands an
     'fast',
     'slow',
   ]);
-  for (const command of program.commands.filter((command) => command.name() !== 'interactive')) {
+  for (const command of program.commands) {
     const rootItem = (await completion.suggest('', 0, true)).items.find(
       (item) => item.value === command.name(),
     );
@@ -316,7 +316,7 @@ test('view anchors the dropdown at the current word, aligns labels and bounds la
   assert.equal(cellWidth('界👋'), 4);
   assert.equal(cellWidth('e\u0301'), 1);
   const welcome = theme.welcome(80);
-  assert.match(welcome, /interactive  ·  live commands/);
+  assert.doesNotMatch(welcome, /interactive  ·  live commands/);
   assert.match(welcome, /Ctrl\+Space suggest   ·   Tab \/ Enter accept/);
   assert.doesNotMatch(welcome, /preview only|Ln \d/);
   assert.ok(
@@ -361,7 +361,7 @@ test('interactive dispatch reuses the real app, validates before side effects an
   });
   const scripts = new ScriptLibrary(root);
   await writeFile(join(root, 'bad.ncell'), 'logout\ninteractive');
-  await runCli(['interactive'], {
+  await runCli([], {
     app,
     scripts,
     io: {
@@ -389,17 +389,12 @@ test('interactive dispatch reuses the real app, validates before side effects an
       assert.equal(prompts, 1);
       assert.equal(requests, 1);
       await assert.rejects(session.execute('interactive'), /Already in/);
+      await assert.rejects(session.execute('ncell'), /Already in/);
     },
   });
-  await assert.rejects(
-    runCli(['interactive', '--json'], { app, scripts, io: quiet }),
-    /does not support --json/,
-  );
+  await assert.rejects(runCli(['--json'], { app, scripts, io: quiet }), /does not support --json/);
   if (!process.stdin.isTTY || !process.stdout.isTTY)
-    await assert.rejects(
-      runCli(['interactive'], { app, scripts, io: quiet }),
-      /requires a terminal/,
-    );
+    await assert.rejects(runCli([], { app, scripts, io: quiet }), /requires a terminal/);
 });
 
 test('required values come before options until every argument is complete', async () => {

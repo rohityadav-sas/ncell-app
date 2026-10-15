@@ -419,14 +419,12 @@ export class CompletionEngine {
     if ((!active && !explicit) || active?.quoted || terminal) return result;
     const commands: Suggestion[] =
       !positional && !localOption && !prefix.startsWith('-')
-        ? command.commands
-            .filter((child) => child.name() !== 'interactive')
-            .map((child) => ({
-              value: child.name(),
-              description: child.description(),
-              kind: 'command',
-              branch: child.commands.length > 0 && child.name() !== 'plans',
-            }))
+        ? command.commands.map((child) => ({
+            value: child.name(),
+            description: child.description(),
+            kind: 'command',
+            branch: child.commands.length > 0 && child.name() !== 'plans',
+          }))
         : [];
     if (command === this.program && !prefix.startsWith('-'))
       commands.push(

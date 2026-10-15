@@ -32,7 +32,7 @@ ID      Plan                             Price    Validity
 ## Interactive mode
 
 ```sh
-ncell interactive
+ncell
 ```
 
 Live dropdown completion, argument hints, script files and plan categories are available without shell setup. Commands execute against your saved account. See the [interactive guide](https://rohityadav-sas.github.io/ncell-app/#interactive).

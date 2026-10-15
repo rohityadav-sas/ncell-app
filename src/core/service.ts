@@ -16,6 +16,7 @@ import type {
 } from './types.js';
 
 const CATEGORY_TTL = 600_000;
+const PLANS_TTL = 300_000;
 
 function notLoggedIn(): NcellError {
   return new NcellError('No saved account. Run `ncell login <number>`', { code: 'NOT_LOGGED_IN' });
@@ -56,6 +57,7 @@ export class AccountService {
   readonly store: SessionStore;
   private readonly api: ApiClient;
   private readonly categoriesCache = new Map<string, { savedAt: number; response: JsonObject }>();
+  private readonly plansCache = new Map<string, { savedAt: number; response: JsonObject }>();
   private tail: Promise<void> = Promise.resolve();
 
   constructor(options: AccountOptions = {}) {
@@ -337,6 +339,12 @@ export class AccountService {
   }
 
   private async getPlans(account: Account, category: number, keyword: string): Promise<JsonObject> {
+    // The completion prefetch and a later subscribe ask for the same page;
+    // serve repeats from memory so the second lookup makes no request.
+    const key = `${account.msisdn}:${category}:${keyword}`;
+    const cached = this.plansCache.get(key);
+    if (cached !== undefined && Date.now() - cached.savedAt < PLANS_TTL)
+      return structuredClone(cached.response);
     let catalog = 'data';
     if (category !== DEFAULT_PLAN_CATEGORY) {
       const tags = (await this.getCategories(account)).tags as unknown[];
@@ -366,6 +374,7 @@ export class AccountService {
       account.accessToken,
     );
     if (!Array.isArray(response.availablePackages)) throw invalidResponse();
+    this.plansCache.set(key, { savedAt: Date.now(), response: structuredClone(response) });
     return response;
   }
 
@@ -422,6 +431,10 @@ export class AccountService {
         (result === undefined || String(object(result).status).toLowerCase() !== 'success')
       )
         throw invalidResponse();
+      // The bought pack may vanish from the list; drop cached plan pages so
+      // the next lookup refetches instead of showing a stale entry.
+      for (const key of this.plansCache.keys())
+        if (key.startsWith(`${account.msisdn}:`)) this.plansCache.delete(key);
       return response;
     });
   }

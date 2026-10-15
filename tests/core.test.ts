@@ -391,6 +391,43 @@ test('failed catalog replies are not cached', async () => {
   assert.equal(server.calls.length, 2);
 });
 
+test('plan pages are cached, copied and cleared by a successful purchase', async (context) => {
+  let now = 1_000;
+  context.mock.method(Date, 'now', () => now);
+  const plan = {
+    id: 'pack',
+    techInfo: { subscriptionCode: '5021027' },
+    ncellName: 'Sample',
+    productOfferingPrice: { price: '0.00' },
+  };
+  const server = mockFetch([
+    ok({ availablePackages: [plan] }),
+    {
+      body: {
+        responseHeader: { responseCode: '00', responseDescDisplay: 'BIL1000' },
+        productSubscriptionSummaryResponse: { status: 'success' },
+      },
+    },
+    ok({ availablePackages: [plan] }),
+    ok({ availablePackages: [plan] }),
+  ]);
+  const client = new AccountService({
+    fetch: server.fetch,
+    store: new MemorySessionStore(session()),
+  });
+  const first = await client.plans({});
+  (first.availablePackages as unknown[]).length = 0;
+  assert.deepEqual((await client.plans({})).availablePackages, [plan]);
+  assert.equal(server.calls.length, 1);
+  await client.subscribe('pack');
+  assert.equal(server.calls.length, 2);
+  await client.plans({});
+  assert.equal(server.calls.length, 3);
+  now += 300_001;
+  await client.plans({});
+  assert.equal(server.calls.length, 4);
+});
+
 test('purchase uses catalog metadata and saved device, accepts BIL1000 only on billing success', async () => {
   const plan = {
     id: 'pack',

@@ -306,11 +306,13 @@ async function execute(command: ParsedCommand, context: Context): Promise<void> 
     case 'script run': {
       const source = await context.scripts.read(number);
       const steps = parseScript(source, (argv) => {
+        // There is no interactive subcommand anymore; answer the word here
+        // so scripts keep the friendly error instead of an unknown command.
+        if (argv[0] === 'interactive')
+          throw new Error('Interactive mode cannot run inside a script');
         const parsed = parseCommand(argv, { out: () => {}, err: () => {} });
         if (parsed.command.startsWith('script '))
           throw new Error('Nested script commands are not supported');
-        if (parsed.command === 'interactive')
-          throw new Error('Interactive mode cannot run inside a script');
         return parsed;
       });
       await executeScript(steps, async (step, index, total) => {
@@ -348,13 +350,19 @@ export async function runCli(argv: string[], options: CliOptions = {}): Promise<
     terminal: !!process.stderr.isTTY,
     ...options.io,
   };
-  let command: ParsedCommand;
-  try {
-    command = parseCommand(argv, argv.includes('--json') ? { ...io, err: () => {} } : io);
-  } catch (error) {
-    if (argv.includes('--json') && error instanceof CommanderError && error.exitCode > 0)
-      throw new Error(error.message);
-    throw error;
+  let command: ParsedCommand | undefined;
+  // Bare `ncell` opens the interactive shell. Only the global --json flag
+  // may ride along (and is rejected inside); anything else goes through the
+  // parser so help, version and unknown options keep their exact behavior.
+  const bare = argv.every((arg) => arg === '--json');
+  if (!bare) {
+    try {
+      command = parseCommand(argv, argv.includes('--json') ? { ...io, err: () => {} } : io);
+    } catch (error) {
+      if (argv.includes('--json') && error instanceof CommanderError && error.exitCode > 0)
+        throw new Error(error.message);
+      throw error;
+    }
   }
   const context: Context = {
     app: options.app ?? new NcellApp(),
@@ -362,8 +370,8 @@ export async function runCli(argv: string[], options: CliOptions = {}): Promise<
     io,
     formatter: new Formatter({ write: io.out, color: io.color }),
   };
-  if (command.command === 'interactive') {
-    if (command.json) throw new Error('Interactive mode does not support --json');
+  if (bare) {
+    if (argv.includes('--json')) throw new Error('Interactive mode does not support --json');
     const completion = new CompletionEngine({
       categories: () => context.app.categories(),
       plans: (category) => context.app.plans({ category }),
@@ -376,7 +384,10 @@ export async function runCli(argv: string[], options: CliOptions = {}): Promise<
       execute: async (line) => {
         const args = tokenize(line);
         if (args[0] === 'ncell') args.shift();
-        if (!args.length) return;
+        // There is no interactive subcommand anymore: bare `ncell` opens the
+        // shell, so both spellings are answered here instead of executing.
+        if (!args.length || args[0] === 'interactive')
+          throw new Error('Already in interactive mode');
         let parsed: ParsedCommand;
         try {
           parsed = parseCommand(args, { out: io.out, err: () => {} });
@@ -384,22 +395,23 @@ export async function runCli(argv: string[], options: CliOptions = {}): Promise<
           if (error instanceof CommanderError && error.exitCode === 0) return;
           throw error;
         }
-        if (parsed.command === 'interactive') throw new Error('Already in interactive mode');
+        let succeeded = false;
         try {
           await runCli(args, { ...options, app: context.app, scripts: context.scripts, io });
+          succeeded = true;
         } catch (error) {
           if (!(error instanceof CommanderError && error.exitCode === 0)) throw error;
         } finally {
+          // A cancelled or failed command changes nothing, so keep the
+          // caches; scripts always invalidate since a half-finished script
+          // may have subscribed.
           if (
-            [
-              'login',
-              'logout',
-              'refresh',
-              'script run',
-              'plans categories',
-              'plans subscribe',
-            ].includes(parsed.command) ||
-            parsed.command.startsWith('account ')
+            parsed.command === 'script run' ||
+            (succeeded &&
+              (['login', 'logout', 'refresh', 'plans categories', 'plans subscribe'].includes(
+                parsed.command,
+              ) ||
+                parsed.command.startsWith('account ')))
           )
             completion.invalidate();
         }
@@ -407,7 +419,7 @@ export async function runCli(argv: string[], options: CliOptions = {}): Promise<
     });
     return;
   }
-  await execute(command, context);
+  if (command) await execute(command, context);
 }
 
 export function errorOutput(error: unknown, json: boolean): string {

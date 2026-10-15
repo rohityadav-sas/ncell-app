@@ -122,13 +122,7 @@ export class InteractiveTheme {
         );
     } else rows.push(frame(this.lavender('NCELL'), 5));
     rows.push(frame('', 0));
-    const subtitle = fit('interactive  ·  live commands', inner);
-    rows.push(
-      frame(this.accent(subtitle), cellWidth(subtitle)),
-      frame('', 0),
-      indent + this.border('╰' + '─'.repeat(inner) + '╯'),
-      '',
-    );
+    rows.push(indent + this.border('╰' + '─'.repeat(inner) + '╯'), '');
     const help = fit(
       columns >= 43
         ? 'Ctrl+Space suggest   ·   Tab / Enter accept'
