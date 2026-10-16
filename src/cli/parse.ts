@@ -71,7 +71,7 @@ export function createProgram(
     };
   const login = program
     .command('login')
-    .description('Request an OTP and log in. Use --verify to resume a pending login')
+    .description('Request an OTP and log in.')
     .argument('<number>', 'Ncell number')
     .option('--verify', '')
     .action(action('login'));
