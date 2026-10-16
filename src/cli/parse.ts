@@ -71,9 +71,9 @@ export function createProgram(
     };
   const login = program
     .command('login')
-    .description('Request an OTP and log in.')
+    .description('Request an OTP and log in')
     .argument('<number>', 'Ncell number')
-    .option('--verify', '')
+    .option('--verify', 'Continue a pending login with your OTP')
     .action(action('login'));
   void login;
   const account = program.command('account').description('Manage saved accounts');
@@ -81,7 +81,7 @@ export function createProgram(
     .command('add')
     .description('Save an account without switching')
     .argument('<number>', 'Ncell number')
-    .option('--verify', '')
+    .option('--verify', 'Continue a pending login with your OTP')
     .action(action('account add'));
   account.command('list').description('List saved accounts').action(action('account list'));
   account
