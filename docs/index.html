@@ -422,7 +422,8 @@
           ><span>Installation</span></a
         >
         <a href="#interactive"
-          ><svg class="ico" aria-hidden="true"><use href="#i-terminal" /></svg
+          ><svg class="ico" aria-hidden="true">
+            <use href="#i-terminal" /></svg
           ><span>Interactive mode</span></a
         >
         <p class="nav-title">Accounts</p>
@@ -673,16 +674,8 @@
         </p>
 
         <h2 id="interactive">Interactive mode</h2>
-        <p>
-          Open an interactive command prompt with live dropdown suggestions. No shell profile setup
-          is needed.
-        </p>
+        <p>Open an interactive command prompt with autocomplete.</p>
         <pre data-lang="Shell"><code>ncell</code></pre>
-        <p>
-          Type <code>ga</code> to suggest <code>game</code>, then <code>sp</code> to suggest
-          <code>spin</code>. Suggestions stay hidden at an empty prompt until you press
-          <kbd>Ctrl+Space</kbd>.
-        </p>
         <table>
           <thead>
             <tr>
@@ -692,55 +685,31 @@
           </thead>
           <tbody>
             <tr>
-              <td>Ctrl+Space</td>
-              <td>Show suggestions for the current word or next argument</td>
+              <td><kbd>Ctrl+Space</kbd></td>
+              <td>Show suggestions</td>
             </tr>
             <tr>
-              <td>Up / Down</td>
-              <td>Select a suggestion, or browse command history when the dropdown is closed</td>
+              <td><kbd>Up</kbd> / <kbd>Down</kbd></td>
+              <td>Select a suggestion, or browse command history</td>
             </tr>
             <tr>
-              <td>Tab / Enter</td>
-              <td>Accept the selected suggestion; Enter runs a complete command</td>
+              <td><kbd>Tab</kbd> / <kbd>Enter</kbd></td>
+              <td>Accept the selected suggestion</td>
             </tr>
             <tr>
-              <td>clear</td>
-              <td>Clear the screen and show the banner again</td>
+              <td><kbd>Esc</kbd></td>
+              <td>Dismiss suggestions</td>
             </tr>
             <tr>
-              <td>Esc</td>
-              <td>Dismiss suggestions while keeping the command and argument hints</td>
-            </tr>
-            <tr>
-              <td>Ctrl+A</td>
-              <td>Select the whole command; typing replaces it</td>
-            </tr>
-            <tr>
-              <td>Ctrl+Backspace</td>
-              <td>Delete the previous word</td>
-            </tr>
-            <tr>
-              <td>Ctrl+C / exit</td>
+              <td><kbd>Ctrl+C</kbd> / <kbd>exit</kbd></td>
               <td>Close interactive mode</td>
             </tr>
           </tbody>
         </table>
-        <p>
-          Use the same commands as the normal CLI, without the <code>ncell</code> prefix. Required
-          argument hints, plan sort directions and comma-separated fields are shown as you type.
-          Category values come from the active account's catalog. Saved <code>.ncell</code> files
-          are suggested for script commands.
-        </p>
-        <p>
-          Commands run against your saved account. Sending an SMS, subscribing to a plan and playing
-          games have the same effects as their normal CLI commands. This is a live command prompt.
-          It requires an interactive terminal; use ordinary commands and <code>--json</code> for
-          automation.
-        </p>
 
         <h2 id="login">Authentication</h2>
 
-        <p>Sign in with an OTP. The code is visible as you type:</p>
+        <p>Sign in with an OTP:</p>
 
         <pre data-lang="Shell"><code>ncell login 98XXXXXXXX</code></pre>
 
@@ -882,17 +851,10 @@
         <h3 id="searching-sort">Sort by more than one field</h3>
 
         <h4>Combine sort fields</h4>
-        <p>
-          Separate ordered sort fields with commas. This searches SMS plans and sorts by validity
-          descending, then price ascending.
-        </p>
+        <p>Separate ordered sort fields with commas.</p>
         <pre
           data-lang="Shell"
         ><code>ncell plans search "SMS" --category 50 --sort validity:desc,price:asc</code></pre>
-
-        <h4>Use the default direction</h4>
-        <p>Omit directions to sort both fields in ascending order.</p>
-        <pre data-lang="Shell"><code>ncell plans --sort validity,price</code></pre>
 
         <p>
           Supported fields are <code>price</code> and
@@ -908,17 +870,16 @@
         <pre data-lang="Shell"><code>ncell plans --category 50</code></pre>
 
         <h3>Subscribe</h3>
-        <p>Use the plan ID and its category. Paid packs charge your Ncell account.</p>
+        <p>
+          Use the plan ID and its category. Paid packs deducts money from your balance, so the
+          command shows the name and price and asks for confirmation. Use <code>--yes</code> to skip
+          it (usually, used in scripts).
+        </p>
         <pre data-lang="Shell"><code>ncell plans subscribe 984 --category 50</code></pre>
 
         <p>
-          Buying asks for confirmation. Use <code>--yes</code> in scripts and pipes, or
-          <code>--dry-run</code> to preview the purchase without spending anything.
-        </p>
-
-        <p>
           The plan ID is a required positional argument. Use a category ID from the category list;
-          <code>--category</code> defaults to 66.
+          <code>--category</code> defaults to <code>66</code>.
         </p>
 
         <h2 id="sms">Send Free SMS</h2>
