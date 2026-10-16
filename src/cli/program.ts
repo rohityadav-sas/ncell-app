@@ -289,7 +289,7 @@ async function execute(command: ParsedCommand, context: Context): Promise<void> 
             }
           } else if (event.event === 'game_start') {
             if (command.json) emit(context, event);
-            else {
+            else if (kind === 'math') {
               if (event.game > 1) format.message('');
               if (repeated) {
                 format.progress(
@@ -297,7 +297,7 @@ async function execute(command: ParsedCommand, context: Context): Promise<void> 
                 );
                 format.message('');
               }
-              if (kind === 'math') format.mathHeader();
+              format.mathHeader();
             }
           } else if (event.event === 'answer') {
             result(context, command, event.result, () => format.mathAnswer(event.result));

@@ -464,21 +464,18 @@ test('human profile output includes the current account number', async () => {
   assert.match(h.output(), /^Number: 9800000000\nName: Test Account/);
 });
 
-test('human progress appears immediately and separates repeated games', async () => {
+test('human spin results print one line per game without progress tables', async () => {
   const h = harness();
-  let observed = 0;
-  h.custom((url) => {
-    if (url.endsWith('fetchSpinReward.php')) {
-      observed++;
-      assert.match(h.output(), new RegExp(`Game ${observed} of 2`));
-      if (observed === 2) assert.match(h.output(), /Spin 1/);
-    }
-    return undefined;
-  });
   await runCli(['game', 'spin', '--count', '2'], { app: h.app, io: h.io });
-  assert.match(h.output(), /^Game 1 of 2\n\nGame\s+Reward/);
-  assert.match(h.output(), /Spin 1[^\n]*\n\nGame 2 of 2\n\nGame\s+Reward/);
-  assert.match(h.output(), /Spin 2[^\n]*\n$/);
+  assert.match(
+    h.output(),
+    /^Spin 1 completed\. Reward awarded: 50\. Game tokens: 75\. Weekly points: 5000\.\n/,
+  );
+  assert.match(
+    h.output(),
+    /Spin 2 completed\. Reward awarded: 50\. Game tokens: 50\. Weekly points: 5000\.\n$/,
+  );
+  assert.doesNotMatch(h.output(), /Game \d+ of \d/);
   assert.equal(
     h.requests.filter((request) => request.url.endsWith('fetchSpinReward.php')).length,
     2,
@@ -488,8 +485,14 @@ test('human progress appears immediately and separates repeated games', async ()
 test('all-token play reports an affordable total and stops without a max-games option', async () => {
   const h = harness();
   await runCli(['game', 'spin', '--count', 'all'], { app: h.app, io: h.io });
-  assert.match(h.output(), /^Game 1 of 4\n/);
-  assert.match(h.output(), /Game 4 of 4/);
+  assert.match(
+    h.output(),
+    /Spin 1 completed\. Reward awarded: 50\. Game tokens: 75\. Weekly points: 5000\./,
+  );
+  assert.match(
+    h.output(),
+    /Spin 4 completed\. Reward awarded: 50\. Game tokens: 0\. Weekly points: 5000\./,
+  );
   assert.match(h.output(), /No tokens left for another game\.\n$/);
   assert.equal(
     h.requests.filter((request) => request.url.endsWith('fetchSpinReward.php')).length,

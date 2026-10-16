@@ -235,24 +235,35 @@ test('math is streamed as an aligned table and bg_reward is hidden only in norma
   assert.match(output(), /\{\n  "bg_reward": 10\n\}\n$/);
 });
 
-test('reward rows align and script progress distinguishes index and command', () => {
+test('reward results read as single lines and script progress distinguishes index and command', () => {
   const { formatter, output } = capture(true);
   formatter.progress('Step 1 of 3 · ncell game spin --count 3');
   formatter.reward('spin', {
+    value: '250',
     description: '250 Points',
     new_token_balance: 60,
     new_week_points: 8720,
   });
   formatter.reward(
     'scratch',
-    { description: '50 Points', points_remaining: 35, new_week_points: 8770 },
+    {
+      value: '50',
+      description: '50 Points',
+      points_remaining: 35,
+      new_week_points: 8770,
+    },
     2,
-    false,
   );
   assert.match(output(), /\x1b\[36m.*Step 1 of 3/);
   assert.match(output(), /\x1b\[33mncell game spin --count 3\x1b\[39m/);
-  assert.match(output(), /Spin 1\s+250 Points\s+60\s+8,720/);
-  assert.match(output(), /Scratch 2\s+50 Points\s+35\s+8,770/);
+  assert.match(
+    output(),
+    /Spin 1 completed\. Reward awarded: 250\. Game tokens: 60\. Weekly points: 8720\./,
+  );
+  assert.match(
+    output(),
+    /Scratch 2 completed\. Reward awarded: 50\. Game tokens: 35\. Weekly points: 8770\./,
+  );
 });
 
 test('empty states and already-completed rewards remain clear', () => {

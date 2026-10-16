@@ -396,28 +396,13 @@ export class Formatter {
     );
   }
 
-  reward(kind: 'spin' | 'scratch', raw: Data, game = 1, header = true): void {
-    const columns: Column[] = [
-      { title: 'Game', width: 12 },
-      { title: 'Reward', width: 20 },
-      { title: 'Tokens', width: 8, align: 'right' },
-      { title: 'Points', width: 12, align: 'right' },
-    ];
-    const row = [
-      `${kind === 'spin' ? 'Spin' : 'Scratch'} ${game}`,
-      text(raw.description),
-      number(kind === 'scratch' ? raw.points_remaining : raw.new_token_balance),
-      number(raw.new_week_points),
-    ];
-    if (header) this.table(columns, [row]);
-    else
-      this.message(
-        columns
-          .map((column, index) =>
-            pad(row[index] ?? '', column.width ?? width(column.title), column.align),
-          )
-          .join('  '),
-      );
+  reward(kind: 'spin' | 'scratch', raw: Data, game = 1): void {
+    // One claim-style line per game; only the math table keeps headers.
+    const label = kind === 'spin' ? 'Spin' : 'Scratch';
+    const tokens = kind === 'scratch' ? raw.points_remaining : raw.new_token_balance;
+    this.message(
+      `${label} ${game} completed. Reward awarded: ${text(raw.value, '-')}. Game tokens: ${text(tokens, '-')}. Weekly points: ${text(raw.new_week_points, '-')}.`,
+    );
   }
 
   mathHeader(): void {
