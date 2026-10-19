@@ -1,24 +1,23 @@
 import { spawn } from 'node:child_process';
-import { access } from 'node:fs/promises';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { createRequire } from 'node:module';
 import { NcellError } from '../core/index.js';
 
-/** Packaged documentation page; resolvable both installed and from a checkout. */
-export function docsFile(): string {
-  return fileURLToPath(new URL('../../docs/index.html', import.meta.url));
-}
+const { homepage } = createRequire(import.meta.url)('../../package.json') as {
+  homepage?: unknown;
+};
 
 export async function openDocs(
   opener: (target: string) => Promise<void> = openBrowser,
 ): Promise<string> {
-  const file = docsFile();
-  try {
-    await access(file);
-  } catch {
-    throw new NcellError('Documentation is not included with this installation');
+  if (typeof homepage !== 'string' || homepage.trim() === '') {
+    throw new NcellError('Set homepage in package.json to the online documentation URL');
   }
-  await opener(pathToFileURL(file).href);
-  return file;
+  try {
+    await opener(homepage);
+  } catch (cause) {
+    throw new NcellError(`Could not open a browser. Documentation: ${homepage}`, { cause });
+  }
+  return homepage;
 }
 
 /** Open a URL in the default browser without waiting for it to close. */
@@ -32,7 +31,9 @@ export function openBrowser(target: string): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     const child = spawn(command, [...args], { detached: true, stdio: 'ignore' });
     child.once('error', reject);
-    child.unref();
-    resolve();
+    child.once('spawn', () => {
+      child.unref();
+      resolve();
+    });
   });
 }

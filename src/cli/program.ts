@@ -133,9 +133,9 @@ async function execute(command: ParsedCommand, context: Context): Promise<void> 
       return;
     }
     case 'docs': {
-      const file = await openDocs();
-      result(context, command, { opened: file }, () =>
-        format.message(`Opened documentation at ${file}.`),
+      const url = await openDocs();
+      result(context, command, { opened: url }, () =>
+        format.message(`Opened documentation at ${url}.`),
       );
       return;
     }

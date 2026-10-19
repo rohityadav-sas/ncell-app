@@ -246,13 +246,32 @@ test('parse every CLI command family with global JSON and standard defaults', ()
   assert.equal(parse(['game', 'math', '--delay', '.5s']).delay, 0.5);
 });
 
-test('docs opens the packaged documentation without a browser side effect in tests', async () => {
+test('docs opens the package homepage without a browser side effect in tests', async () => {
   let opened = '';
-  const file = await openDocs(async (target) => {
+  const url = await openDocs(async (target) => {
     opened = target;
   });
-  assert.match(file, /docs.index\.html$/);
-  assert.match(opened, /^file:.*docs.index\.html$/);
+  const { homepage } = JSON.parse(
+    await readFile(new URL('../package.json', import.meta.url), 'utf8'),
+  ) as { homepage: string };
+  assert.equal(url, homepage);
+  assert.equal(opened, homepage);
+});
+
+test('docs includes the online URL when the browser cannot be opened', async () => {
+  const { homepage } = JSON.parse(
+    await readFile(new URL('../package.json', import.meta.url), 'utf8'),
+  ) as { homepage: string };
+  await assert.rejects(
+    openDocs(async () => {
+      throw new Error('Browser launch failed');
+    }),
+    (error: unknown) => {
+      assert.ok(error instanceof NcellError);
+      assert.equal(error.message, `Could not open a browser. Documentation: ${homepage}`);
+      return true;
+    },
+  );
 });
 
 test('invalid commands, counts, delays, destinations and task IDs fail before execution', () => {
